@@ -180,14 +180,13 @@ body {
   z-index: 0;
 }
 
-/* Inner circle: centered in the wrap, large so the ring stays thin */
+/* Inner circle: centered in the wrap, large so the ring stays thin. Use aspect-ratio so height is real and flex centering works. */
 .dial-center {
   position: absolute;
   left: 50%;
   top: 50%;
   width: 76%;
-  padding-bottom: 76%;
-  height: 0;
+  aspect-ratio: 1;
   margin: -38% 0 0 -38%;
   background: var(--ha-surface);
   border-radius: 50%;
@@ -207,6 +206,7 @@ body {
   justify-content: center;
   text-align: center;
   gap: 0.25rem;
+  border-radius: 50%;
 }
 
 .dial-center .dial-mode,
