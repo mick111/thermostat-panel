@@ -147,7 +147,13 @@
     el.lastUpdate.textContent = "Last update: " + formatTime(state.last_updated);
 
     var modeState = (state.state || "").toLowerCase();
-    el.modeLabel.textContent = modeState === "heat" ? "Heat" : (modeState === "off" ? "Off" : modeState || "—");
+    var hvacAction = (attrs.hvac_action || "").toLowerCase();
+    if (hvacAction === "heating") el.modeLabel.textContent = "Chauffe";
+    else if (hvacAction === "idle") el.modeLabel.textContent = "Inactif";
+    else if (hvacAction === "off") el.modeLabel.textContent = "Arrêt";
+    else if (modeState === "heat") el.modeLabel.textContent = "Chauffage";
+    else if (modeState === "off") el.modeLabel.textContent = "Arrêt";
+    else el.modeLabel.textContent = modeState || "—";
 
     var minT = attrs.min_temp != null ? parseFloat(attrs.min_temp, 10) : 5;
     var maxT = attrs.max_temp != null ? parseFloat(attrs.max_temp, 10) : 35;
