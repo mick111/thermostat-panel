@@ -174,7 +174,7 @@ body {
   position: relative;
   width: 100%;
   padding-bottom: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: -1rem;
 }
 
 /* SVG dial (works on old iOS too) */
@@ -313,7 +313,7 @@ body {
   margin: 0;
 }
 
-.target-row .btn-round + .btn-round {
+.target-row .btn-round+.btn-round {
   margin-left: 2rem;
 }
 
@@ -323,7 +323,7 @@ body {
     gap: 2rem;
   }
 
-  .target-row .btn-round + .btn-round {
+  .target-row .btn-round+.btn-round {
     margin-left: 0;
   }
 }
