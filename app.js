@@ -122,8 +122,8 @@
     var minT = attrs.min_temp != null ? parseFloat(attrs.min_temp, 10) : 5;
     var maxT = attrs.max_temp != null ? parseFloat(attrs.max_temp, 10) : 35;
     var targetNum = target != null ? parseFloat(target, 10) : minT;
-    /* 0° = bottom-left, 180° = bottom-right (arc goes over the top, clockwise) */
-    var angle = maxT > minT ? ((targetNum - minT) / (maxT - minT)) * 180 : 0;
+    /* 0° = bottom-left, 270° = arc span (clockwise) */
+    var angle = maxT > minT ? ((targetNum - minT) / (maxT - minT)) * 270 : 0;
     el.dialFill.style.setProperty("--dial-angle", angle + "deg");
 
     var presetMode = (attrs.preset_mode || "").toLowerCase();

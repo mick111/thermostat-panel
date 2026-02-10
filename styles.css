@@ -163,13 +163,13 @@ html, body {
   border-radius: 50%;
   box-sizing: border-box;
   --dial-angle: 0deg;
-  /* Arc from 225deg (bottom-left) clockwise 180deg to 45deg (bottom-right), i.e. over the top */
+  /* Arc from 225deg (bottom-left) clockwise 270deg */
   background: conic-gradient(
     from 225deg,
     var(--ha-heat-soft) 0deg,
     var(--ha-heat-soft) var(--dial-angle),
     transparent var(--dial-angle),
-    transparent 180deg
+    transparent 270deg
   );
   -webkit-mask: radial-gradient(circle, transparent 32%, black 32%);
   mask: radial-gradient(circle, transparent 32%, black 32%);
