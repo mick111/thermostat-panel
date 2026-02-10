@@ -1,7 +1,20 @@
-/* Panneau thermostat — style kiosque, plein écran, tactile */
+/* Thermostat panel — Home Assistant style, light theme */
 
 * {
   box-sizing: border-box;
+}
+
+:root {
+  --ha-bg: #fafafa;
+  --ha-surface: #ffffff;
+  --ha-text: #212121;
+  --ha-text-secondary: #727272;
+  --ha-divider: #e0e0e0;
+  --ha-accent: #03a9f4;
+  --ha-heat: #e67e22;
+  --ha-heat-soft: #f5b041;
+  --ha-shadow: rgba(0, 0, 0, 0.08);
+  --ha-shadow-hover: rgba(0, 0, 0, 0.12);
 }
 
 html, body {
@@ -15,9 +28,9 @@ html, body {
   -webkit-user-select: none;
   user-select: none;
   touch-action: manipulation;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #1a1a2e;
-  color: #eee;
+  font-family: "Roboto", -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--ha-bg);
+  color: var(--ha-text);
 }
 
 #app {
@@ -29,29 +42,10 @@ html, body {
 
 /* Header */
 .header {
-  padding: 1rem 1.5rem;
-  background: #16213e;
-  border-bottom: 2px solid #0f3460;
-}
-
-.header h1 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.status {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #a0a0a0;
-}
-
-.status.connected {
-  color: #4ecca3;
-}
-
-.status.error {
-  color: #e94560;
+  padding: 0.75rem 1rem;
+  background: var(--ha-surface);
+  border-bottom: 1px solid var(--ha-divider);
+  box-shadow: 0 1px 2px var(--ha-shadow);
 }
 
 .status-row {
@@ -61,26 +55,39 @@ html, body {
   flex-wrap: wrap;
 }
 
-.status-row .status {
+.status {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ha-text-secondary);
   flex: 1;
   min-width: 0;
 }
 
+.status.connected {
+  color: #2e7d32;
+}
+
+.status.error {
+  color: #c62828;
+}
+
 .btn-refresh {
   flex-shrink: 0;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.85rem;
-  background: #0f3460;
-  color: #eee;
-  border: 1px solid #e94560;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  background: var(--ha-surface);
+  color: var(--ha-text);
+  border: 1px solid var(--ha-divider);
   border-radius: 8px;
   cursor: pointer;
+  box-shadow: 0 1px 2px var(--ha-shadow);
 }
 
 .btn-refresh:hover,
 .btn-refresh:active {
-  background: #e94560;
-  color: #fff;
+  background: #f5f5f5;
+  box-shadow: 0 2px 4px var(--ha-shadow-hover);
 }
 
 /* Main */
@@ -88,41 +95,116 @@ html, body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding: 1.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
   overflow: auto;
 }
 
-.card {
-  background: #16213e;
-  border-radius: 12px;
-  padding: 1.5rem;
-  border: 1px solid #0f3460;
-}
-
-.card h2 {
-  margin: 0 0 1rem 0;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #a0a0a0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.big-value {
-  margin: 0;
-  font-size: 3rem;
-  font-weight: 700;
+/* Current temp (top) */
+.current-temp-section {
   text-align: center;
-  line-height: 1.2;
+  margin-bottom: 0.25rem;
 }
 
-.temp-card .big-value,
-.target-card .big-value {
-  color: #4ecca3;
+.current-temp-section .label {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ha-text-secondary);
+  text-transform: none;
+  letter-spacing: 0;
 }
 
-/* Ligne consigne +/− */
+.current-temp-value {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: var(--ha-text);
+}
+
+/* Dial section */
+.dial-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 280px;
+}
+
+.dial-wrap {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  margin-bottom: 1rem;
+}
+
+.dial-bg,
+.dial-fill,
+.dial-center {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.dial-bg {
+  background: var(--ha-divider);
+}
+
+.dial-fill {
+  --dial-angle: 0deg;
+  --dial-color: var(--ha-heat-soft);
+  --dial-bg: transparent;
+  background: conic-gradient(
+    from -90deg,
+    var(--dial-color) 0deg,
+    var(--dial-color) var(--dial-angle),
+    var(--ha-divider) var(--dial-angle),
+    var(--ha-divider) 360deg
+  );
+}
+
+.dial-center {
+  top: 50%;
+  left: 50%;
+  width: 76%;
+  height: 76%;
+  margin: -38% 0 0 -38%;
+  background: var(--ha-surface);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px var(--ha-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.dial-mode {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ha-heat);
+}
+
+.dial-target {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--ha-text);
+  line-height: 1.1;
+}
+
+.dial-target .unit {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--ha-text-secondary);
+}
+
+/* +/- buttons */
 .target-row {
   display: flex;
   align-items: center;
@@ -131,22 +213,24 @@ html, body {
 }
 
 .btn-round {
-  width: 4rem;
-  height: 4rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
-  border: 2px solid #0f3460;
-  background: #0f3460;
-  color: #fff;
-  font-size: 2rem;
+  border: 1px solid var(--ha-divider);
+  background: var(--ha-surface);
+  color: var(--ha-text);
+  font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
+  font-family: inherit;
+  box-shadow: 0 1px 3px var(--ha-shadow);
   transition: background 0.15s, transform 0.1s;
 }
 
 .btn-round:active {
-  background: #4ecca3;
+  background: #eeeeee;
   transform: scale(0.95);
 }
 
@@ -155,51 +239,108 @@ html, body {
   cursor: not-allowed;
 }
 
-/* Boutons mode */
-.mode-value {
-  margin: 0 0 1rem 0;
-  font-size: 1.25rem;
-  color: #4ecca3;
+/* Bottom: Mode + Preset buttons (HA style) */
+.actions-row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 320px;
+  margin-top: 0.5rem;
 }
 
-.buttons-row {
+.btn-action {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--ha-divider);
+  background: var(--ha-surface);
+  color: var(--ha-text);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  box-shadow: 0 1px 3px var(--ha-shadow);
+  transition: box-shadow 0.2s, background 0.2s;
+  min-height: 72px;
+}
+
+.btn-action:hover,
+.btn-action:active {
+  background: #f5f5f5;
+  box-shadow: 0 2px 6px var(--ha-shadow-hover);
+}
+
+.btn-action-icon {
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
+  opacity: 0.9;
+}
+
+.btn-action-label {
+  font-weight: 500;
+  color: var(--ha-text-secondary);
+  margin-bottom: 0.15rem;
+}
+
+.btn-action-value {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--ha-text);
+}
+
+/* Preset chips row */
+.preset-card {
+  display: none;
+  width: 100%;
+  max-width: 320px;
+  margin-top: 0.5rem;
+}
+
+.preset-card .buttons-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  justify-content: center;
 }
 
-.btn-mode {
-  flex: 1;
-  min-width: 100px;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 2px solid #0f3460;
-  background: #0f3460;
-  color: #fff;
-  font-size: 1rem;
+.btn-preset-chip {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--ha-divider);
+  background: var(--ha-surface);
+  color: var(--ha-text);
+  font-family: inherit;
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  box-shadow: 0 1px 2px var(--ha-shadow);
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.btn-mode:active {
+.btn-preset-chip.active {
+  background: var(--ha-heat-soft);
+  border-color: var(--ha-heat);
+  color: #1a1a1a;
+}
+
+.btn-preset-chip:active {
   transform: scale(0.98);
-}
-
-.btn-mode.active {
-  background: #4ecca3;
-  border-color: #4ecca3;
-  color: #1a1a2e;
 }
 
 /* Footer */
 .footer {
-  padding: 0.75rem 1.5rem;
-  background: #0f3460;
-  font-size: 0.8rem;
-  color: #708090;
+  padding: 0.5rem 1rem;
+  background: var(--ha-surface);
+  border-top: 1px solid var(--ha-divider);
+  font-size: 0.75rem;
+  color: var(--ha-text-secondary);
   text-align: center;
 }
 

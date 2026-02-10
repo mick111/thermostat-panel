@@ -9,48 +9,66 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="mobile-web-app-capable" content="yes">
   <title>Thermostat</title>
-  <!-- Bump ?v= after each deploy to force reload (home screen, cache) -->
+  <!-- Bump app-version and ?v= in links/scripts after each deploy -->
+  <meta name="app-version" content="2">
   <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
+  <script>
+  (function(){var m=document.querySelector('meta[name="app-version"]');var docVer=parseInt(m?m.getAttribute('content'):0,10)||0;var key='thermostat-panel-v';var stored=parseInt(localStorage.getItem(key),10)||0;if(stored>docVer){var path=location.pathname.replace(/index\.html$/i,'').replace(/\/$/,'')||'/';location.replace(path+'/?t='+Date.now());return;}try{localStorage.setItem(key,String(docVer));}catch(e){}
+  })();
+  </script>
   <div id="app">
     <header class="header">
-      <h1>Thermostat</h1>
       <div class="status-row">
         <p id="status" class="status">Loading…</p>
-        <button type="button" id="btnRefresh" class="btn btn-refresh" aria-label="Refresh page"
-          title="Refresh">Refresh</button>
+        <button type="button" id="btnRefresh" class="btn btn-refresh" aria-label="Refresh page" title="Refresh">Refresh</button>
       </div>
     </header>
 
     <main class="main">
-      <section class="card temp-card">
-        <h2>Current temperature</h2>
-        <p id="currentTemp" class="big-value">--</p>
+      <section class="current-temp-section">
+        <h2 class="label">Current temperature</h2>
+        <p id="currentTemp" class="current-temp-value">--</p>
       </section>
 
-      <section class="card target-card">
-        <h2>Setpoint</h2>
+      <section class="dial-section">
+        <div class="dial-wrap" id="dialWrap">
+          <div class="dial-bg"></div>
+          <div class="dial-fill" id="dialFill"></div>
+          <div class="dial-center">
+            <p id="modeLabel" class="dial-mode">—</p>
+            <p id="targetTemp" class="dial-target">--</p>
+          </div>
+        </div>
         <div class="target-row">
           <button type="button" id="btnDown" class="btn btn-round" aria-label="Decrease">−</button>
-          <p id="targetTemp" class="big-value">--</p>
           <button type="button" id="btnUp" class="btn btn-round" aria-label="Increase">+</button>
         </div>
       </section>
 
-      <section class="card mode-card">
-        <h2>Mode</h2>
-        <p id="mode" class="mode-value">--</p>
-        <div class="buttons-row">
-          <button type="button" id="btnHeat" class="btn btn-mode">Heat</button>
-          <button type="button" id="btnCool" class="btn btn-mode">Cool</button>
-          <button type="button" id="btnAuto" class="btn btn-mode">Auto</button>
-          <button type="button" id="btnOff" class="btn btn-mode">Off</button>
-        </div>
+      <section class="actions-row">
+        <button type="button" id="btnMode" class="btn btn-action">
+          <span class="btn-action-icon">🔥</span>
+          <span class="btn-action-label">Mode</span>
+          <span id="modeValue" class="btn-action-value">—</span>
+        </button>
+        <button type="button" id="btnPresetMain" class="btn btn-action btn-preset-main">
+          <span class="btn-action-icon">•</span>
+          <span class="btn-action-label">Preset</span>
+          <span id="presetValue" class="btn-action-value">None</span>
+        </button>
+      </section>
+
+      <section class="card preset-card" id="presetCard">
+        <div class="buttons-row" id="presetButtons"></div>
       </section>
     </main>
 

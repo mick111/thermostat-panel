@@ -13,6 +13,7 @@
   var entityId = CONFIG.thermostatEntityId;
   var step = CONFIG.stepDegrees;
   var refreshInterval = CONFIG.refreshInterval;
+  var allowedPresets = ["away", "comfort", "eco", "sleep"];
 
   var el = {
     status: document.getElementById("status"),
@@ -22,11 +23,14 @@
     lastUpdate: document.getElementById("lastUpdate"),
     btnUp: document.getElementById("btnUp"),
     btnDown: document.getElementById("btnDown"),
-    mode: document.getElementById("mode"),
-    btnHeat: document.getElementById("btnHeat"),
-    btnCool: document.getElementById("btnCool"),
-    btnAuto: document.getElementById("btnAuto"),
-    btnOff: document.getElementById("btnOff")
+    modeLabel: document.getElementById("modeLabel"),
+    dialFill: document.getElementById("dialFill"),
+    modeValue: document.getElementById("modeValue"),
+    presetValue: document.getElementById("presetValue"),
+    btnMode: document.getElementById("btnMode"),
+    btnPresetMain: document.getElementById("btnPresetMain"),
+    presetCard: document.getElementById("presetCard"),
+    presetButtons: document.getElementById("presetButtons")
   };
 
   var currentState = null;
@@ -35,6 +39,7 @@
   function setStatus(text, className) {
     el.status.textContent = text;
     el.status.className = "status " + (className || "");
+    el.btnRefresh.style.display = (className === "connected") ? "none" : "";
   }
 
   function formatTemp(value) {
@@ -114,18 +119,34 @@
     el.lastUpdate.textContent = "Last update: " + formatTime(state.last_updated);
 
     var modeState = (state.state || "").toLowerCase();
-    el.mode.textContent = modeState || "—";
-
-    [el.btnHeat, el.btnCool, el.btnAuto, el.btnOff].forEach(function (btn) {
-      btn.classList.remove("active");
-    });
-    if (modeState === "heat") el.btnHeat.classList.add("active");
-    else if (modeState === "cool") el.btnCool.classList.add("active");
-    else if (modeState === "auto" || modeState === "heat_cool") el.btnAuto.classList.add("active");
-    else if (modeState === "off") el.btnOff.classList.add("active");
+    el.modeLabel.textContent = modeState === "heat" ? "Heat" : (modeState === "off" ? "Off" : modeState || "—");
+    el.modeValue.textContent = modeState === "heat" ? "Heat" : (modeState === "off" ? "Off" : modeState || "—");
 
     var minT = attrs.min_temp != null ? parseFloat(attrs.min_temp, 10) : 5;
     var maxT = attrs.max_temp != null ? parseFloat(attrs.max_temp, 10) : 35;
+    var targetNum = target != null ? parseFloat(target, 10) : minT;
+    var angle = maxT > minT ? ((targetNum - minT) / (maxT - minT)) * 360 : 0;
+    el.dialFill.style.setProperty("--dial-angle", angle + "deg");
+
+    var presetMode = attrs.preset_mode;
+    var presetModes = attrs.preset_modes || [];
+    var filteredPresets = allowedPresets.filter(function (p) { return presetModes.indexOf(p) !== -1; });
+    el.presetValue.textContent = presetMode ? (presetMode.charAt(0).toUpperCase() + presetMode.slice(1)) : "None";
+    if (filteredPresets.length > 0) {
+      el.presetCard.style.display = "";
+      el.presetButtons.innerHTML = "";
+      filteredPresets.forEach(function (pm) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-preset-chip" + (pm === presetMode ? " active" : "");
+        btn.textContent = pm.charAt(0).toUpperCase() + pm.slice(1);
+        btn.addEventListener("click", function () { setPresetMode(pm); });
+        el.presetButtons.appendChild(btn);
+      });
+    } else {
+      el.presetCard.style.display = "none";
+    }
+
     el.btnUp.disabled = target != null && parseFloat(target, 10) >= maxT;
     el.btnDown.disabled = target != null && parseFloat(target, 10) <= minT;
   }
@@ -173,6 +194,19 @@
     });
   }
 
+  function setPresetMode(preset) {
+    apiRequest("POST", "/api/services/climate/set_preset_mode", {
+      entity_id: entityId,
+      preset_mode: preset
+    }, function (err) {
+      if (err) {
+        setStatus("Error: " + err.message, "error");
+      } else {
+        refresh();
+      }
+    });
+  }
+
   function onUp() {
     if (!currentState || !currentState.attributes) return;
     var t = currentState.attributes.temperature;
@@ -193,10 +227,11 @@
 
   el.btnUp.addEventListener("click", onUp);
   el.btnDown.addEventListener("click", onDown);
-  el.btnHeat.addEventListener("click", function () { setHVACMode("heat"); });
-  el.btnCool.addEventListener("click", function () { setHVACMode("cool"); });
-  el.btnAuto.addEventListener("click", function () { setHVACMode("auto"); });
-  el.btnOff.addEventListener("click", function () { setHVACMode("off"); });
+  el.btnMode.addEventListener("click", function () {
+    if (!currentState) return;
+    var modeState = (currentState.state || "").toLowerCase();
+    setHVACMode(modeState === "heat" ? "off" : "heat");
+  });
 
   refresh();
   refreshTimer = setInterval(refresh, refreshInterval);

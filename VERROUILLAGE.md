@@ -43,13 +43,23 @@ Then launch **that icon** and enable **Guided Access** (triple-click). The iPad 
 
 ### Updating when the page is on the home screen
 
-iOS and Safari cache pages added to the home screen. After updating files on the server (HA), you may feel the old version is still showing.
+iOS and Safari cache pages added to the home screen (and sometimes a **Service Worker** from Home Assistant caches responses). After updating files on the server, you may still see the old version.
 
-**What to do:**
+**What to do (in order):**
 
-1. **Bump the version in `index.html`**: scripts and CSS are loaded with `?v=1`. After a deploy, change to `?v=2`, then `?v=3`, etc. (in all three places: `styles.css?v=…`, `config.js?v=…`, `app.js?v=…`). Copy `index.html` to the server again. On the next load, the browser will fetch the new files.
-2. **Remove and recreate the shortcut**: on the iPad, long-press the Thermostat icon on the home screen → **Remove App** (or **Delete**). Then in Safari, open the panel URL again and **Add to Home Screen** again.
-3. **Clear site data** (if needed): Settings → Safari → Advanced → Website Data → find your domain → delete. Then open the page again and optionally add it to the home screen again.
+1. **On the server**: After each deploy, bump the version in `index.html`:
+   - `<meta name="app-version" content="2">` → change to `3`, then `4`, etc.
+   - In the three URLs: `styles.css?v=2`, `config.js?v=2`, `app.js?v=2` → use the same number.
+   Copy the updated files to the Pi.
+
+2. **On the iPad – clear caches and shortcut**:
+   - **Remove the home screen icon**: long-press the Thermostat icon → **Remove App** / **Delete**.
+   - **Clear website data**: **Settings** → **Safari** → **Advanced** → **Website Data** → search for your HA domain (e.g. `echiquier.duckdns.org`) → **Swipe left** → **Delete**. This removes the cache and any Service Worker for that site.
+   - **Quit Safari fully**: from the app switcher (double‑click Home or swipe up), swipe Safari away so it’s closed.
+   - Open **Safari** again, go to the panel URL (e.g. `https://…/local/thermostat-panel/`). You should get the new version. Optionally add a version in the URL when testing: `.../thermostat-panel/?v=3`.
+   - **Add to Home Screen** again (Share → Add to Home Screen).
+
+3. **If it still shows the old version**: The app includes a small script that detects when the loaded page is older than a version you had before (stored in the browser). In that case it forces a reload with a cache-busting URL. So after step 2, the first load might redirect once and then show the new version. If not, try **Settings** → **Safari** → **Clear History and Website Data** (this clears all Safari data), then open the panel URL and add to home screen again.
 
 ---
 
