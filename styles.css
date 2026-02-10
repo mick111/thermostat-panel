@@ -123,7 +123,7 @@ html, body {
   color: var(--ha-text);
 }
 
-/* Dial section — arc from bottom-left to bottom-right (semicircle) */
+/* Dial section — full ring around the number, arc bottom-left → over top → bottom-right (clockwise) */
 .dial-section {
   display: flex;
   flex-direction: column;
@@ -135,50 +135,55 @@ html, body {
 .dial-wrap {
   position: relative;
   width: 100%;
-  padding-bottom: 50%;
+  padding-bottom: 100%;
   margin-bottom: 1rem;
-  overflow: hidden;
 }
 
-.dial-bg,
-.dial-fill {
+.dial-bg {
   position: absolute;
+  top: 0;
   left: 0;
-  bottom: 0;
   width: 100%;
   height: 0;
   padding-bottom: 100%;
   border-radius: 50%;
+  box-sizing: border-box;
+  border: 10px solid var(--ha-divider);
+  background: transparent;
   z-index: 0;
 }
 
-.dial-bg {
-  background: var(--ha-divider);
-  border: 3px solid #bdbdbd;
-  box-sizing: border-box;
-}
-
 .dial-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+  border-radius: 50%;
+  box-sizing: border-box;
   --dial-angle: 0deg;
+  /* Arc from 225deg (bottom-left) clockwise 180deg to 45deg (bottom-right), i.e. over the top */
   background: conic-gradient(
-    from 270deg,
+    from 225deg,
     var(--ha-heat-soft) 0deg,
     var(--ha-heat-soft) var(--dial-angle),
-    var(--ha-divider) var(--dial-angle),
-    var(--ha-divider) 180deg
+    transparent var(--dial-angle),
+    transparent 180deg
   );
-  border: 3px solid rgba(0, 0, 0, 0.06);
-  box-sizing: border-box;
+  -webkit-mask: radial-gradient(circle, transparent 32%, black 32%);
+  mask: radial-gradient(circle, transparent 32%, black 32%);
+  z-index: 0;
 }
 
 .dial-center {
   position: absolute;
   left: 50%;
-  top: 25%;
-  width: 46%;
-  padding-bottom: 46%;
+  top: 50%;
+  width: 64%;
+  padding-bottom: 64%;
   height: 0;
-  margin: -23% 0 0 -23%;
+  margin: -32% 0 0 -32%;
   background: var(--ha-surface);
   border-radius: 50%;
   box-shadow: 0 2px 8px var(--ha-shadow);
