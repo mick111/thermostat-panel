@@ -29,6 +29,7 @@
     activity: "#c62828"
   };
   var LANG_STORAGE_KEY = "thermostat-panel-lang";
+  var UNIT_STORAGE_KEY = "thermostat-panel-unit";
 
   var I18N = {
     en: {
@@ -52,6 +53,8 @@
       presetComfort: "Comfort",
       ariaDecrease: "Decrease",
       ariaIncrease: "Increase",
+      unitToggleAria: "Toggle temperature unit",
+      unitToggleTitle: "Switch between Celsius and Fahrenheit",
       comfortMessage: "⚠️ Significant environmental impact ⚠️\n🌍 Let's think about our planet 🌍"
     },
     fr: {
@@ -75,6 +78,8 @@
       presetComfort: "Confort",
       ariaDecrease: "Baisser",
       ariaIncrease: "Monter",
+      unitToggleAria: "Basculer l'unité de température",
+      unitToggleTitle: "Basculer entre Celsius et Fahrenheit",
       comfortMessage: "⚠️ Impact environnemental important ⚠️\n🌍 Pensons à notre planète 🌍"
     },
     es: {
@@ -98,6 +103,8 @@
       presetComfort: "Confort",
       ariaDecrease: "Bajar",
       ariaIncrease: "Subir",
+      unitToggleAria: "Cambiar unidad de temperatura",
+      unitToggleTitle: "Alternar entre Celsius y Fahrenheit",
       comfortMessage: "⚠️ Impacto ambiental importante ⚠️\n🌍 Pensemos en nuestro planeta 🌍"
     },
     zh: {
@@ -121,6 +128,8 @@
       presetComfort: "舒适",
       ariaDecrease: "降低",
       ariaIncrease: "升高",
+      unitToggleAria: "切换温度单位",
+      unitToggleTitle: "在摄氏度和华氏度之间切换",
       comfortMessage: "⚠️ 环境影响重大 ⚠️\n🌍 让我们一起关心我们的地球 🌍"
     }
   };
@@ -128,6 +137,7 @@
   var el = {
     status: document.getElementById("status"),
     btnRefresh: document.getElementById("btnRefresh"),
+    btnUnitToggle: document.getElementById("btnUnitToggle"),
     btnLangFr: document.getElementById("btnLangFr"),
     btnLangEn: document.getElementById("btnLangEn"),
     btnLangEs: document.getElementById("btnLangEs"),
@@ -156,6 +166,8 @@
   var currentState = null;
   var refreshTimer = null;
   var currentLang = "en";
+  var displayUnit = "C";
+  var backendTempUnit = "C";
   var lastStatusType = "loading";
   var lastStatusErrorMessage = "";
 
@@ -171,6 +183,20 @@
     if (currentLang === "es") return "es-ES";
     if (currentLang === "zh") return "zh-CN";
     return "en-US";
+  }
+
+  function normalizeTemperatureUnit(unit) {
+    var u = String(unit || "").toUpperCase();
+    if (u.indexOf("F") !== -1) return "F";
+    return "C";
+  }
+
+  function convertTemperature(value, fromUnit, toUnit) {
+    var from = normalizeTemperatureUnit(fromUnit);
+    var to = normalizeTemperatureUnit(toUnit);
+    if (from === to) return value;
+    if (from === "C" && to === "F") return (value * 9 / 5) + 32;
+    return (value - 32) * 5 / 9;
   }
 
   function setStatus(text, className) {
@@ -215,13 +241,14 @@
     }
   }
 
-  function formatTemp(value) {
+  function formatTemp(value, sourceUnit) {
     if (value == null || value === "") return "—";
     var n = parseFloat(value, 10);
     if (isNaN(n)) return "—";
-    var temp = n.toFixed(1);
+    var converted = convertTemperature(n, sourceUnit || backendTempUnit, displayUnit);
+    var temp = converted.toFixed(1);
     if (currentLang !== "en") temp = temp.replace(".", ",");
-    return temp + "°C";
+    return temp + "°" + displayUnit;
   }
 
   function formatTime(isoString) {
@@ -264,6 +291,13 @@
     if (targetNum >= PRESET_TEMPERATURES.comfort) return "comfort";
     if (targetNum >= PRESET_TEMPERATURES.eco) return "eco";
     return "away";
+  }
+
+  function clampBetween(value, min, max) {
+    var out = value;
+    if (min != null && !isNaN(min) && out < min) out = min;
+    if (max != null && !isNaN(max) && out > max) out = max;
+    return out;
   }
 
   function apiRequest(method, path, body, callback) {
@@ -318,11 +352,13 @@
     if (!state || state.attributes === undefined) return;
 
     var attrs = state.attributes;
+    var tempUnit = normalizeTemperatureUnit(attrs.temperature_unit || attrs.unit_of_measurement);
+    backendTempUnit = tempUnit;
     var current = attrs.current_temperature != null ? attrs.current_temperature : attrs.temperature;
     var target = attrs.temperature;
 
-    el.currentTemp.textContent = formatTemp(current);
-    el.targetTemp.textContent = formatTemp(target);
+    el.currentTemp.textContent = formatTemp(current, tempUnit);
+    el.targetTemp.textContent = formatTemp(target, tempUnit);
     el.lastUpdate.textContent = t("lastUpdatePrefix") + formatTime(state.last_updated);
 
     var modeState = (state.state || "").toLowerCase();
@@ -341,7 +377,8 @@
     var targetDelta = targetRatio * ARC_SPAN_DEG;
     el.dialTrackPath.setAttribute("d", describeArc(ARC_START_DEG, ARC_SPAN_DEG, ARC_RADIUS));
     el.dialFillPath.setAttribute("d", describeArc(ARC_START_DEG, targetDelta, ARC_RADIUS));
-    var ringMode = modeFromTargetTemperature(targetNum);
+    var targetNumC = convertTemperature(targetNum, tempUnit, "C");
+    var ringMode = modeFromTargetTemperature(targetNumC);
     el.dialFillPath.setAttribute("stroke", RING_COLORS[ringMode] || RING_COLORS.comfort);
 
     var currentNum = current != null ? parseFloat(current, 10) : minT;
@@ -360,7 +397,7 @@
     else if (presetMode === "eco") el.btnPresetEco.classList.add("active");
     else if (presetMode === "comfort") el.btnPresetComfort.classList.add("active");
 
-    el.comfortMessage.style.display = targetNum > PRESET_TEMPERATURES.activity ? "" : "none";
+    el.comfortMessage.style.display = targetNumC > PRESET_TEMPERATURES.activity ? "" : "none";
 
     el.btnUp.disabled = target != null && parseFloat(target, 10) >= maxT;
     el.btnDown.disabled = target != null && parseFloat(target, 10) <= minT;
@@ -375,9 +412,24 @@
     return lang;
   }
 
+  function loadSavedUnit() {
+    var unit = "C";
+    try {
+      var saved = localStorage.getItem(UNIT_STORAGE_KEY);
+      if (saved === "C" || saved === "F") unit = saved;
+    } catch (e) { }
+    return unit;
+  }
+
   function saveLanguage(lang) {
     try {
       localStorage.setItem(LANG_STORAGE_KEY, lang);
+    } catch (e) { }
+  }
+
+  function saveUnit(unit) {
+    try {
+      localStorage.setItem(UNIT_STORAGE_KEY, unit);
     } catch (e) { }
   }
 
@@ -390,6 +442,20 @@
     else if (currentLang === "es" && el.btnLangEs) el.btnLangEs.classList.add("active");
     else if (currentLang === "zh" && el.btnLangZh) el.btnLangZh.classList.add("active");
     else if (el.btnLangEn) el.btnLangEn.classList.add("active");
+  }
+
+  function updateUnitToggleButton() {
+    if (!el.btnUnitToggle) return;
+    el.btnUnitToggle.textContent = "°" + displayUnit;
+    if (displayUnit === "F") el.btnUnitToggle.classList.add("active");
+    else el.btnUnitToggle.classList.remove("active");
+  }
+
+  function toggleTemperatureUnit() {
+    displayUnit = displayUnit === "F" ? "C" : "F";
+    saveUnit(displayUnit);
+    updateUnitToggleButton();
+    if (currentState) updateUI(currentState);
   }
 
   function applyTranslations() {
@@ -410,8 +476,13 @@
     if (el.btnPresetComfort) el.btnPresetComfort.setAttribute("title", t("presetComfort"));
     if (el.btnDown) el.btnDown.setAttribute("aria-label", t("ariaDecrease"));
     if (el.btnUp) el.btnUp.setAttribute("aria-label", t("ariaIncrease"));
+    if (el.btnUnitToggle) {
+      el.btnUnitToggle.setAttribute("aria-label", t("unitToggleAria"));
+      el.btnUnitToggle.setAttribute("title", t("unitToggleTitle"));
+    }
     if (el.comfortMessage) el.comfortMessage.textContent = t("comfortMessage");
 
+    updateUnitToggleButton();
     updateLanguageButtons();
     rerenderStatusForLanguage();
     if (currentState) updateUI(currentState);
@@ -466,25 +537,35 @@
     });
   }
 
-  function onUp() {
+  function adjustTarget(deltaInDisplayUnit) {
     if (!currentState || !currentState.attributes) return;
-    var tValue = currentState.attributes.temperature;
-    if (tValue == null) tValue = 20;
-    var next = parseFloat(tValue, 10) + step;
-    setTemperature(next);
+    var attrs = currentState.attributes;
+    var sourceUnit = normalizeTemperatureUnit(attrs.temperature_unit || attrs.unit_of_measurement || backendTempUnit);
+    var minT = attrs.min_temp != null ? parseFloat(attrs.min_temp, 10) : null;
+    var maxT = attrs.max_temp != null ? parseFloat(attrs.max_temp, 10) : null;
+    var tValue = attrs.temperature;
+    if (tValue == null) tValue = sourceUnit === "F" ? 68 : 20;
+    var currentTarget = parseFloat(tValue, 10);
+    if (isNaN(currentTarget)) currentTarget = sourceUnit === "F" ? 68 : 20;
+    var currentInDisplayUnit = convertTemperature(currentTarget, sourceUnit, displayUnit);
+    var nextInDisplayUnit = currentInDisplayUnit + deltaInDisplayUnit;
+    var nextInSourceUnit = convertTemperature(nextInDisplayUnit, displayUnit, sourceUnit);
+    nextInSourceUnit = clampBetween(nextInSourceUnit, minT, maxT);
+    setTemperature(parseFloat(nextInSourceUnit.toFixed(2)));
+  }
+
+  function onUp() {
+    adjustTarget(step);
   }
 
   function onDown() {
-    if (!currentState || !currentState.attributes) return;
-    var tValue = currentState.attributes.temperature;
-    if (tValue == null) tValue = 20;
-    var next = parseFloat(tValue, 10) - step;
-    setTemperature(next);
+    adjustTarget(-step);
   }
 
   el.btnRefresh.addEventListener("click", function () { window.location.reload(); });
   el.btnUp.addEventListener("click", onUp);
   el.btnDown.addEventListener("click", onDown);
+  if (el.btnUnitToggle) el.btnUnitToggle.addEventListener("click", toggleTemperatureUnit);
   el.btnPresetAway.addEventListener("click", function () { setPresetMode("away"); });
   el.btnPresetComfort.addEventListener("click", function () { setPresetMode("comfort"); });
   el.btnPresetEco.addEventListener("click", function () { setPresetMode("eco"); });
@@ -501,6 +582,7 @@
   if (el.btnLangZh) el.btnLangZh.addEventListener("click", function () { setLanguage("zh"); });
 
   currentLang = loadSavedLanguage();
+  displayUnit = loadSavedUnit();
   applyTranslations();
   setStatusLoading();
   refresh();
