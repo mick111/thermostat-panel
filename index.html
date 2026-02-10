@@ -13,8 +13,8 @@
   <meta name="mobile-web-app-capable" content="yes">
   <title>Thermostat</title>
   <!-- Bump app-version and ?v= in links/scripts after each deploy -->
-  <meta name="app-version" content="2">
-  <link rel="stylesheet" href="styles.css?v=2">
+  <meta name="app-version" content="3">
+  <link rel="stylesheet" href="styles.css?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -41,11 +41,11 @@
 
       <section class="dial-section">
         <div class="dial-wrap" id="dialWrap">
-          <div class="dial-bg"></div>
-          <div class="dial-fill" id="dialFill"></div>
-          <div class="dial-current-dot-wrap" id="dialCurrentDotWrap" aria-hidden="true">
-            <span class="dial-current-dot" title="Current temperature"></span>
-          </div>
+          <svg class="dial-svg" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+            <path id="dialTrackPath" class="dial-track-path"></path>
+            <path id="dialFillPath" class="dial-fill-path"></path>
+            <circle id="dialCurrentDot" class="dial-current-dot" cx="50" cy="50" r="1.8"></circle>
+          </svg>
           <div class="dial-center">
             <div class="dial-center-inner">
               <p id="modeLabel" class="dial-mode">—</p>
@@ -74,8 +74,8 @@
     </footer>
   </div>
 
-  <script src="config.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="config.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 
 </html>

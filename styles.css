@@ -140,82 +140,36 @@ body {
   margin-bottom: 1rem;
 }
 
-/* Ring track: fallback for old iOS (simple border), then conic+mask for modern */
-.dial-bg {
+/* SVG dial (works on old iOS too) */
+.dial-svg {
   position: absolute;
   top: 0;
+  right: 0;
+  bottom: 0;
   left: 0;
   width: 100%;
-  height: 0;
-  padding-bottom: 100%;
-  border-radius: 50%;
-  box-sizing: border-box;
-  border: 6px solid var(--ha-divider);
-  background: transparent;
+  height: 100%;
+  overflow: visible;
 }
 
-@supports (background: conic-gradient(red 0deg, blue 360deg)) {
-  .dial-bg {
-    border: none;
-    mask: radial-gradient(circle, transparent, transparent 65%, black 65%, black);
-    -webkit-mask: radial-gradient(circle, transparent, transparent 65%, black 65%, black);
-    background: conic-gradient(from 225deg,
-        var(--ha-divider) 0deg,
-        var(--ha-divider) 270deg,
-        transparent 270deg,
-        transparent 270deg);
-  }
+.dial-track-path {
+  fill: none;
+  stroke: var(--ha-divider);
+  stroke-width: 10;
+  stroke-linecap: round;
 }
 
-/* Orange arc: fallback transparent for old iOS, then conic+mask for modern */
-.dial-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 0;
-  padding-bottom: 100%;
-  border-radius: 50%;
-  box-sizing: border-box;
-  --dial-angle: 0deg;
-  background: transparent;
-}
-
-@supports (background: conic-gradient(red 0deg, blue 360deg)) {
-  .dial-fill {
-    background: conic-gradient(from 225deg,
-        var(--ha-heat-soft) 0deg,
-        var(--ha-heat-soft) var(--dial-angle),
-        transparent var(--dial-angle),
-        transparent 270deg);
-    -webkit-mask: radial-gradient(circle, transparent, transparent 65%, black 65%, black);
-    mask: radial-gradient(circle, transparent, transparent 65%, black 65%, black);
-  }
-}
-
-/* Dot on the ring indicating current temperature (angle set by JS) */
-.dial-current-dot-wrap {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 100%;
-  height: 0;
-  padding-bottom: 96%;
-  pointer-events: none;
-  z-index: 1;
+.dial-fill-path {
+  fill: none;
+  stroke: var(--ha-heat-soft);
+  stroke-width: 10;
+  stroke-linecap: round;
 }
 
 .dial-current-dot {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 10px;
-  height: 10px;
-  margin-left: -5px;
-  margin-top: -5px;
-  background: var(--ha-text-secondary);
-  border-radius: 50%;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  fill: var(--ha-text-secondary);
+  stroke: var(--ha-surface);
+  stroke-width: 1.2;
 }
 
 /* Inner circle: fallback for old iOS (padding-bottom gives height), then aspect-ratio for modern */

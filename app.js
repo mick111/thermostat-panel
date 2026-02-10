@@ -13,6 +13,9 @@
   var entityId = CONFIG.thermostatEntityId;
   var step = CONFIG.stepDegrees;
   var refreshInterval = CONFIG.refreshInterval;
+  var ARC_START_DEG = 225;
+  var ARC_SPAN_DEG = 270;
+  var ARC_RADIUS = 43;
 
   var el = {
     status: document.getElementById("status"),
@@ -23,8 +26,9 @@
     btnUp: document.getElementById("btnUp"),
     btnDown: document.getElementById("btnDown"),
     modeLabel: document.getElementById("modeLabel"),
-    dialFill: document.getElementById("dialFill"),
-    dialCurrentDotWrap: document.getElementById("dialCurrentDotWrap"),
+    dialTrackPath: document.getElementById("dialTrackPath"),
+    dialFillPath: document.getElementById("dialFillPath"),
+    dialCurrentDot: document.getElementById("dialCurrentDot"),
     btnPresetAway: document.getElementById("btnPresetAway"),
     btnPresetSleep: document.getElementById("btnPresetSleep"),
     btnPresetEco: document.getElementById("btnPresetEco"),
@@ -56,6 +60,31 @@
     } catch (e) {
       return "—";
     }
+  }
+
+  function clamp01(value) {
+    if (value < 0) return 0;
+    if (value > 1) return 1;
+    return value;
+  }
+
+  function polarToCartesian(angleDeg, radius) {
+    var rad = (angleDeg - 90) * Math.PI / 180;
+    return {
+      x: 50 + radius * Math.cos(rad),
+      y: 50 + radius * Math.sin(rad)
+    };
+  }
+
+  function describeArc(startDeg, deltaDeg, radius) {
+    var start = polarToCartesian(startDeg, radius);
+    if (!deltaDeg || deltaDeg <= 0) {
+      return "M " + start.x + " " + start.y;
+    }
+    var end = polarToCartesian(startDeg + deltaDeg, radius);
+    var largeArcFlag = deltaDeg > 180 ? 1 : 0;
+    return "M " + start.x + " " + start.y +
+      " A " + radius + " " + radius + " 0 " + largeArcFlag + " 1 " + end.x + " " + end.y;
   }
 
   function apiRequest(method, path, body, callback) {
@@ -123,13 +152,17 @@
     var minT = attrs.min_temp != null ? parseFloat(attrs.min_temp, 10) : 5;
     var maxT = attrs.max_temp != null ? parseFloat(attrs.max_temp, 10) : 35;
     var targetNum = target != null ? parseFloat(target, 10) : minT;
-    /* 0° = bottom-left, 270° = arc span (clockwise) */
-    var angle = maxT > minT ? ((targetNum - minT) / (maxT - minT)) * 270 : 0;
-    el.dialFill.style.setProperty("--dial-angle", angle + "deg");
+    var targetRatio = maxT > minT ? clamp01((targetNum - minT) / (maxT - minT)) : 0;
+    var targetDelta = targetRatio * ARC_SPAN_DEG;
+    el.dialTrackPath.setAttribute("d", describeArc(ARC_START_DEG, ARC_SPAN_DEG, ARC_RADIUS));
+    el.dialFillPath.setAttribute("d", describeArc(ARC_START_DEG, targetDelta, ARC_RADIUS));
 
     var currentNum = current != null ? parseFloat(current, 10) : minT;
-    var currentAngle = maxT > minT ? 225 + ((currentNum - minT) / (maxT - minT)) * 270 : 225;
-    el.dialCurrentDotWrap.style.transform = "translate(-50%, -50%) rotate(" + currentAngle + "deg)";
+    var currentRatio = maxT > minT ? clamp01((currentNum - minT) / (maxT - minT)) : 0;
+    var currentAngle = ARC_START_DEG + currentRatio * ARC_SPAN_DEG;
+    var currentPoint = polarToCartesian(currentAngle, ARC_RADIUS);
+    el.dialCurrentDot.setAttribute("cx", currentPoint.x);
+    el.dialCurrentDot.setAttribute("cy", currentPoint.y);
 
     var presetMode = (attrs.preset_mode || "").toLowerCase();
     [el.btnPresetAway, el.btnPresetSleep, el.btnPresetEco, el.btnPresetComfort].forEach(function (btn) {
