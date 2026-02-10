@@ -300,7 +300,29 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
+}
+
+/* Fallback for old iOS (no flex gap support) */
+.target-row .btn-round {
+  margin: 0;
+}
+
+.target-row .btn-round + .btn-round {
+  margin-left: 2rem;
+}
+
+/* Modern browsers */
+@supports (gap: 2rem) {
+  .target-row {
+    gap: 2rem;
+  }
+
+  .target-row .btn-round + .btn-round {
+    margin-left: 0;
+  }
 }
 
 .btn-round {
