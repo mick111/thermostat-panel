@@ -156,7 +156,6 @@ body {
       var(--ha-divider) 270deg,
       transparent 270deg,
       transparent 270deg);
-  z-index: 0;
 }
 
 /* Orange arc: ring with hole so it matches track thickness (inner 38% = hole) */
@@ -177,23 +176,16 @@ body {
       transparent 270deg);
   -webkit-mask: radial-gradient(circle, transparent, transparent 65%, black 65%, black);
   mask: radial-gradient(circle, transparent, transparent 65%, black 65%, black);
-  z-index: 0;
 }
 
 /* Inner circle: centered in the wrap, large so the ring stays thin. Use aspect-ratio so height is real and flex centering works. */
 .dial-center {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 76%;
+  width: 100%;
   aspect-ratio: 1;
-  margin: -38% 0 0 -38%;
-  background: var(--ha-surface);
   border-radius: 50%;
-  box-shadow: 0 2px 8px var(--ha-shadow);
   padding: 0;
   box-sizing: content-box;
-  z-index: 1;
 }
 
 /* Text block: fill the circle; padding-bottom so the temperature line is at vertical center */
