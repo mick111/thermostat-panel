@@ -15,6 +15,9 @@ var CONFIG = {
   // Thermostat entity ID (e.g. climate.living_room, climate.thermostat)
   thermostatEntityId: "climate.thermostat",
 
+  // Guest name entity ID (state contains current guest name)
+  guestEntityId: "sensor.guest_name",
+
   // Temperature step for +/- buttons (degrees)
   stepDegrees: 0.5,
 

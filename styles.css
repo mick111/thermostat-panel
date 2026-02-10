@@ -81,6 +81,15 @@ body {
   color: #c62828;
 }
 
+.welcome-message {
+  margin: 0.4rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--ha-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .btn-refresh {
   flex-shrink: 0;
   padding: 0.35rem 0.75rem;

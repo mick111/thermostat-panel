@@ -10,7 +10,8 @@
     ? (window.location.origin || "").replace(/\/$/, "")
     : CONFIG.baseUrl.replace(/\/$/, "");
   var token = (typeof CONFIG.token === "string" ? CONFIG.token : "").trim();
-  var entityId = CONFIG.thermostatEntityId;
+  var thermostatEntityId = CONFIG.thermostatEntityId;
+  var guestEntityId = CONFIG.guestEntityId;
   var step = CONFIG.stepDegrees;
   var refreshInterval = CONFIG.refreshInterval;
   var ARC_START_DEG = 225;
@@ -63,6 +64,8 @@
       ariaIncrease: "Increase",
       unitToggleAria: "Toggle temperature unit",
       unitToggleTitle: "Switch between Celsius and Fahrenheit",
+      welcomeDefault: "Welcome",
+      welcomeWithName: "Welcome, {name}",
       comfortMessageLine1: "Significant environmental impact",
       comfortMessageLine2: "Let's think about our planet"
     },
@@ -89,6 +92,8 @@
       ariaIncrease: "Monter",
       unitToggleAria: "Basculer l'unité de température",
       unitToggleTitle: "Basculer entre Celsius et Fahrenheit",
+      welcomeDefault: "Bienvenue",
+      welcomeWithName: "Bienvenue, {name}",
       comfortMessageLine1: "Impact environnemental important",
       comfortMessageLine2: "Pensons à notre planète"
     },
@@ -115,6 +120,8 @@
       ariaIncrease: "Subir",
       unitToggleAria: "Cambiar unidad de temperatura",
       unitToggleTitle: "Alternar entre Celsius y Fahrenheit",
+      welcomeDefault: "Bienvenido/a",
+      welcomeWithName: "Bienvenido/a, {name}",
       comfortMessageLine1: "Impacto ambiental importante",
       comfortMessageLine2: "Pensemos en nuestro planeta"
     },
@@ -141,6 +148,8 @@
       ariaIncrease: "升高",
       unitToggleAria: "切换温度单位",
       unitToggleTitle: "在摄氏度和华氏度之间切换",
+      welcomeDefault: "欢迎",
+      welcomeWithName: "欢迎，{name}",
       comfortMessageLine1: "环境影响重大",
       comfortMessageLine2: "让我们一起关心我们的地球"
     }
@@ -148,6 +157,7 @@
 
   var el = {
     status: document.getElementById("status"),
+    welcomeMessage: document.getElementById("welcomeMessage"),
     btnRefresh: document.getElementById("btnRefresh"),
     btnUnitToggle: document.getElementById("btnUnitToggle"),
     btnLangFr: document.getElementById("btnLangFr"),
@@ -183,6 +193,7 @@
   var currentLang = "en";
   var displayUnit = "C";
   var backendTempUnit = "C";
+  var currentGuestName = "";
   var lastStatusType = "loading";
   var lastStatusErrorMessage = "";
 
@@ -216,6 +227,24 @@
 
   function roundToHalf(value) {
     return Math.round(value * 2) / 2;
+  }
+
+  function normalizeGuestName(value) {
+    var text = String(value == null ? "" : value).trim();
+    var lower = text.toLowerCase();
+    if (!text || lower === "unknown" || lower === "unavailable" || lower === "none" || lower === "null") {
+      return "";
+    }
+    return text;
+  }
+
+  function renderWelcomeMessage() {
+    if (!el.welcomeMessage) return;
+    if (currentGuestName) {
+      el.welcomeMessage.textContent = t("welcomeWithName").replace("{name}", currentGuestName);
+    } else {
+      el.welcomeMessage.textContent = t("welcomeDefault");
+    }
   }
 
   function setStatus(text, className) {
@@ -375,13 +404,28 @@
   }
 
   function loadState(callback) {
-    apiRequest("GET", "/api/states/" + encodeURIComponent(entityId), null, function (err, data) {
+    apiRequest("GET", "/api/states/" + encodeURIComponent(thermostatEntityId), null, function (err, data) {
       if (err) {
         if (callback) callback(err);
         return;
       }
       currentState = data;
       if (callback) callback(null, data);
+    });
+  }
+
+  function loadGuestName(callback) {
+    if (!guestEntityId) {
+      if (callback) callback(null, "");
+      return;
+    }
+    apiRequest("GET", "/api/states/" + encodeURIComponent(guestEntityId), null, function (err, data) {
+      if (err) {
+        if (callback) callback(err, "");
+        return;
+      }
+      var guestName = normalizeGuestName(data && data.state);
+      if (callback) callback(null, guestName);
     });
   }
 
@@ -539,6 +583,7 @@
     }
     if (el.comfortMessageLine1) el.comfortMessageLine1.textContent = t("comfortMessageLine1");
     if (el.comfortMessageLine2) el.comfortMessageLine2.textContent = t("comfortMessageLine2");
+    renderWelcomeMessage();
 
     updateUnitToggleButton();
     updateLanguageButtons();
@@ -565,12 +610,17 @@
       }
       setStatusConnected();
       updateUI(state);
+      loadGuestName(function (guestErr, guestName) {
+        if (guestErr) return;
+        currentGuestName = guestName;
+        renderWelcomeMessage();
+      });
     });
   }
 
   function setTemperature(newTemp, done) {
     apiRequest("POST", "/api/services/climate/set_temperature", {
-      entity_id: entityId,
+      entity_id: thermostatEntityId,
       temperature: newTemp
     }, function (err) {
       if (done) done(err);
@@ -584,7 +634,7 @@
 
   function setPresetMode(preset) {
     apiRequest("POST", "/api/services/climate/set_preset_mode", {
-      entity_id: entityId,
+      entity_id: thermostatEntityId,
       preset_mode: preset
     }, function (err) {
       if (err) {

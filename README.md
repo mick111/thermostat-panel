@@ -16,6 +16,7 @@ Minimal web app to control a Home Assistant thermostat from an iPad in kiosk mod
    - `baseUrl`: Home Assistant URL (e.g. `https://homeassistant.local:8123`)
    - `token`: Long-Lived Access Token (Profile → Create token)
    - `thermostatEntityId`: e.g. `climate.living_room`, `climate.thermostat`
+   - `guestEntityId`: e.g. `sensor.guest_name`.
 2. Serve the files over HTTPS (required for the API from a web page). Options:
    - Home Assistant **http** module: add the folder to `config/www/` and access via `https://YOUR_HA:8123/local/thermostat-panel/`
    - Or any other web server (nginx, Apache, etc.) over HTTPS on your network
