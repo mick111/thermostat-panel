@@ -1,5 +1,10 @@
 # Copier le panneau vers le dossier www de Home Assistant
 
+**Important :** La page que vous ouvrez (`https://echiquier.duckdns.org:48123/local/thermostat-panel/`) est servie par Home Assistant. Le navigateur charge donc les fichiers **présents sur le Pi** (dans `config/www/thermostat-panel/`), **pas** ceux de votre Mac.  
+→ Si vous modifiez `config.js` (token, entity_id, etc.) **sur votre Mac**, vous devez **recopier** ce fichier vers le Pi pour que le changement soit pris en compte. Rechargez la page après la copie.
+
+---
+
 Vous n’avez pas accès à la racine dans File Editor : utilisez l’une des méthodes ci-dessous.
 
 ---
@@ -41,18 +46,18 @@ export HA_SSH_PORT="22"
 # Créer le dossier sur le Pi
 ssh -p "$HA_SSH_PORT" root@$HA_HOST "mkdir -p /config/www/thermostat-panel"
 
-# Copier les 4 fichiers
-scp -P "$HA_SSH_PORT" /Users/mick111/thermostat-panel/index.html \
-  /Users/mick111/thermostat-panel/styles.css \
-  /Users/mick111/thermostat-panel/app.js \
-  /Users/mick111/thermostat-panel/config.js \
+# Copier les 4 fichiers (adapter le chemin du projet si besoin)
+scp -P "$HA_SSH_PORT" /Users/mick111/Documents/Projets/thermostat-panel/index.html \
+  /Users/mick111/Documents/Projets/thermostat-panel/styles.css \
+  /Users/mick111/Documents/Projets/thermostat-panel/app.js \
+  /Users/mick111/Documents/Projets/thermostat-panel/config.js \
   root@$HA_HOST:/config/www/thermostat-panel/
 ```
 
 Ou en une seule ligne (adapter IP et port) :
 
 ```bash
-ssh -p 22 root@192.168.1.XX "mkdir -p /config/www/thermostat-panel" && scp -P 22 /Users/mick111/thermostat-panel/{index.html,styles.css,app.js,config.js} root@192.168.1.XX:/config/www/thermostat-panel/
+ssh -p 22 root@192.168.1.XX "mkdir -p /config/www/thermostat-panel" && scp -P 22 /Users/mick111/Documents/Projets/thermostat-panel/{index.html,styles.css,app.js,config.js} root@192.168.1.XX:/config/www/thermostat-panel/
 ```
 
 ---
