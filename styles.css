@@ -178,14 +178,40 @@ body {
   mask: radial-gradient(circle, transparent, transparent 65%, black 65%, black);
 }
 
+/* Dot on the ring indicating current temperature (angle set by JS) */
+.dial-current-dot-wrap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 82%;
+  height: 0;
+  padding-bottom: 82%;
+  margin: -41% 0 0 -41%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.dial-current-dot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  margin-top: -5px;
+  background: var(--ha-text-secondary);
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
 /* Inner circle: centered in the wrap, large so the ring stays thin. Use aspect-ratio so height is real and flex centering works. */
 .dial-center {
   position: absolute;
   width: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
-  padding: 0;
   box-sizing: content-box;
+  z-index: 2;
 }
 
 /* Text block: fill the circle; padding-bottom so the temperature line is at vertical center */

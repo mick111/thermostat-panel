@@ -24,6 +24,7 @@
     btnDown: document.getElementById("btnDown"),
     modeLabel: document.getElementById("modeLabel"),
     dialFill: document.getElementById("dialFill"),
+    dialCurrentDotWrap: document.getElementById("dialCurrentDotWrap"),
     btnPresetAway: document.getElementById("btnPresetAway"),
     btnPresetSleep: document.getElementById("btnPresetSleep"),
     btnPresetEco: document.getElementById("btnPresetEco"),
@@ -125,6 +126,10 @@
     /* 0° = bottom-left, 270° = arc span (clockwise) */
     var angle = maxT > minT ? ((targetNum - minT) / (maxT - minT)) * 270 : 0;
     el.dialFill.style.setProperty("--dial-angle", angle + "deg");
+
+    var currentNum = current != null ? parseFloat(current, 10) : minT;
+    var currentAngle = maxT > minT ? 225 + ((currentNum - minT) / (maxT - minT)) * 270 : 225;
+    el.dialCurrentDotWrap.style.transform = "translate(-50%, -50%) rotate(" + currentAngle + "deg)";
 
     var presetMode = (attrs.preset_mode || "").toLowerCase();
     [el.btnPresetAway, el.btnPresetSleep, el.btnPresetEco, el.btnPresetComfort].forEach(function (btn) {
