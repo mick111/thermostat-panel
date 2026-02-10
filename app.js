@@ -52,7 +52,7 @@
       presetComfort: "Comfort",
       ariaDecrease: "Decrease",
       ariaIncrease: "Increase",
-      comfortMessage: "⚠️ Significant environmental impact\nLet's think about our planet 🌍"
+      comfortMessage: "⚠️ Significant environmental impact ⚠️\n🌍 Let's think about our planet 🌍"
     },
     fr: {
       refresh: "Rafraîchir",
@@ -75,7 +75,7 @@
       presetComfort: "Confort",
       ariaDecrease: "Baisser",
       ariaIncrease: "Monter",
-      comfortMessage: "⚠️ Impact environnemental important\nPensons à notre planète 🌍"
+      comfortMessage: "⚠️ Impact environnemental important ⚠️\n🌍 Pensons à notre planète 🌍"
     },
     es: {
       refresh: "Actualizar",
@@ -98,7 +98,7 @@
       presetComfort: "Confort",
       ariaDecrease: "Bajar",
       ariaIncrease: "Subir",
-      comfortMessage: "⚠️ Impacto ambiental importante\nPensemos en nuestro planeta 🌍"
+      comfortMessage: "⚠️ Impacto ambiental importante ⚠️\n🌍 Pensemos en nuestro planeta 🌍"
     },
     zh: {
       refresh: "刷新",
@@ -121,7 +121,7 @@
       presetComfort: "舒适",
       ariaDecrease: "降低",
       ariaIncrease: "升高",
-      comfortMessage: "⚠️ 环境影响重大\n让我们一起关心我们的地球 🌍"
+      comfortMessage: "⚠️ 环境影响重大 ⚠️\n🌍 让我们一起关心我们的地球 🌍"
     }
   };
 
