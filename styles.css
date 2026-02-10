@@ -636,3 +636,29 @@ body {
   flex-shrink: 0;
   text-align: right;
 }
+
+/* Responsive header fallback when width is tight */
+@media (max-width: 860px) {
+  .status-row {
+    min-height: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .welcome-message {
+    position: static;
+    left: auto;
+    transform: none;
+    max-width: 100%;
+    width: 100%;
+    margin-bottom: 0.4rem;
+    font-size: 1.05rem;
+  }
+
+  .header-controls {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
