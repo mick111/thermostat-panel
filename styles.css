@@ -272,18 +272,59 @@ body {
 .btn-round {
   width: 3rem;
   height: 3rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   border-radius: 50%;
   border: 1px solid var(--ha-divider);
   background: var(--ha-surface);
   color: var(--ha-text);
-  font-size: 1.5rem;
-  line-height: 1;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
   font-family: inherit;
   box-shadow: 0 1px 3px var(--ha-shadow);
   transition: background 0.15s, transform 0.1s;
+}
+
+.btn-icon {
+  position: relative;
+  display: block;
+  width: 1.15rem;
+  height: 1.15rem;
+  color: #606060;
+}
+
+.btn-icon::before,
+.btn-icon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: currentColor;
+  border-radius: 2px;
+}
+
+.btn-icon-minus::before {
+  width: 1.05rem;
+  height: 0.16rem;
+}
+
+.btn-icon-minus::after {
+  display: none;
+}
+
+.btn-icon-plus::before {
+  width: 1.05rem;
+  height: 0.16rem;
+}
+
+.btn-icon-plus::after {
+  width: 0.16rem;
+  height: 1.05rem;
 }
 
 .btn-round:active {
