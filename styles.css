@@ -428,9 +428,9 @@ body {
 }
 
 .btn-preset-activity {
-  background: #ffebee;
-  border-color: #ef9a9a;
-  color: #c62828;
+  background: #fff3e0;
+  border-color: #ffcc80;
+  color: #ef6c00;
 }
 
 .btn-preset-eco {
@@ -463,9 +463,9 @@ body {
 }
 
 .btn-preset-activity.active {
-  background: #ffcdd2;
-  border-color: #c62828;
-  color: #b71c1c;
+  background: #ffe0b2;
+  border-color: #ef6c00;
+  color: #e65100;
 }
 
 .btn-preset-eco.active {

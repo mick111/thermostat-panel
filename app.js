@@ -26,7 +26,8 @@
     away: "#7b1fa2",
     eco: "#388e3c",
     comfort: "#1976d2",
-    activity: "#c62828"
+    activity: "#ef6c00",
+    over: "#c62828"
   };
   var LANG_STORAGE_KEY = "thermostat-panel-lang";
   var UNIT_STORAGE_KEY = "thermostat-panel-unit";
@@ -294,9 +295,10 @@
   }
 
   function modeFromTargetTemperature(targetNum) {
-    if (targetNum >= PRESET_TEMPERATURES.activity) return "activity";
-    if (targetNum >= PRESET_TEMPERATURES.comfort) return "comfort";
-    if (targetNum >= PRESET_TEMPERATURES.eco) return "eco";
+    if (targetNum > PRESET_TEMPERATURES.activity) return "over";
+    if (targetNum > PRESET_TEMPERATURES.comfort) return "activity";
+    if (targetNum > PRESET_TEMPERATURES.eco) return "comfort";
+    if (targetNum > PRESET_TEMPERATURES.away) return "eco";
     return "away";
   }
 
@@ -395,16 +397,16 @@
     el.dialCurrentDot.setAttribute("cx", currentPoint.x);
     el.dialCurrentDot.setAttribute("cy", currentPoint.y);
 
-    var presetMode = (attrs.preset_mode || "").toLowerCase();
+    var targetBand = ringMode;
     [el.btnPresetAway, el.btnPresetActivity, el.btnPresetEco, el.btnPresetComfort].forEach(function (btn) {
       btn.classList.remove("active");
     });
-    if (presetMode === "away") el.btnPresetAway.classList.add("active");
-    else if (presetMode === "activity") el.btnPresetActivity.classList.add("active");
-    else if (presetMode === "eco") el.btnPresetEco.classList.add("active");
-    else if (presetMode === "comfort") el.btnPresetComfort.classList.add("active");
+    if (targetBand === "away") el.btnPresetAway.classList.add("active");
+    else if (targetBand === "eco") el.btnPresetEco.classList.add("active");
+    else if (targetBand === "comfort") el.btnPresetComfort.classList.add("active");
+    else if (targetBand === "activity") el.btnPresetActivity.classList.add("active");
 
-    el.comfortMessage.style.display = targetNumC > PRESET_TEMPERATURES.activity ? "" : "none";
+    el.comfortMessage.style.display = targetBand === "over" ? "" : "none";
 
     el.btnUp.disabled = target != null && parseFloat(target, 10) >= maxT;
     el.btnDown.disabled = target != null && parseFloat(target, 10) <= minT;
