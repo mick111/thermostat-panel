@@ -158,7 +158,8 @@
     btnDown: document.getElementById("btnDown"),
     modeLabel: document.getElementById("modeLabel"),
     dialTrackPath: document.getElementById("dialTrackPath"),
-    dialFillPath: document.getElementById("dialFillPath"),
+    dialFillSoftPath: document.getElementById("dialFillSoftPath"),
+    dialFillStrongPath: document.getElementById("dialFillStrongPath"),
     dialCurrentDot: document.getElementById("dialCurrentDot"),
     btnPresetAway: document.getElementById("btnPresetAway"),
     btnPresetActivity: document.getElementById("btnPresetActivity"),
@@ -301,6 +302,20 @@
       " A " + radius + " " + radius + " 0 " + largeArcFlag + " 1 " + end.x + " " + end.y;
   }
 
+  function describeArcBetween(startDeg, endDeg, radius) {
+    var start = polarToCartesian(startDeg, radius);
+    if (startDeg === endDeg) {
+      return "M " + start.x + " " + start.y;
+    }
+    var end = polarToCartesian(endDeg, radius);
+    var delta = endDeg - startDeg;
+    var absDelta = Math.abs(delta);
+    var largeArcFlag = absDelta > 180 ? 1 : 0;
+    var sweepFlag = delta >= 0 ? 1 : 0;
+    return "M " + start.x + " " + start.y +
+      " A " + radius + " " + radius + " 0 " + largeArcFlag + " " + sweepFlag + " " + end.x + " " + end.y;
+  }
+
   function modeFromTargetTemperature(targetNum) {
     if (targetNum > PRESET_TEMPERATURES.activity) return "over";
     if (targetNum > PRESET_TEMPERATURES.comfort) return "activity";
@@ -396,17 +411,20 @@
     var currentNum = current != null ? parseFloat(current, 10) : targetNum;
     if (isNaN(currentNum)) currentNum = targetNum;
     var targetRatio = maxT > minT ? clamp01((targetNum - minT) / (maxT - minT)) : 0;
-    var targetDelta = targetRatio * ARC_SPAN_DEG;
-    var visibleTargetDelta = targetRatio <= 0 ? 0.75 : targetDelta;
-    el.dialTrackPath.setAttribute("d", describeArc(ARC_START_DEG, ARC_SPAN_DEG, ARC_RADIUS));
-    el.dialFillPath.setAttribute("d", describeArc(ARC_START_DEG, visibleTargetDelta, ARC_RADIUS));
-    var targetNumC = convertTemperature(targetNum, tempUnit, "C");
-    var currentNumC = convertTemperature(currentNum, tempUnit, "C");
-    var ringMode = modeFromTargetTemperature(targetNumC);
-    var ringPalette = targetNumC > currentNumC ? RING_COLORS_STRONG : RING_COLORS_SOFT;
-    el.dialFillPath.setAttribute("stroke", ringPalette[ringMode] || ringPalette.comfort);
-
     var currentRatio = maxT > minT ? clamp01((currentNum - minT) / (maxT - minT)) : 0;
+    var targetDelta = targetRatio * ARC_SPAN_DEG;
+    var currentDelta = currentRatio * ARC_SPAN_DEG;
+    var visibleCurrentDelta = currentRatio <= 0 ? 0.75 : currentDelta;
+    var currentDeg = ARC_START_DEG + currentDelta;
+    var targetDeg = ARC_START_DEG + targetDelta;
+    el.dialTrackPath.setAttribute("d", describeArc(ARC_START_DEG, ARC_SPAN_DEG, ARC_RADIUS));
+    el.dialFillSoftPath.setAttribute("d", describeArc(ARC_START_DEG, visibleCurrentDelta, ARC_RADIUS));
+    el.dialFillStrongPath.setAttribute("d", describeArcBetween(currentDeg, targetDeg, ARC_RADIUS));
+    var targetNumC = convertTemperature(targetNum, tempUnit, "C");
+    var ringMode = modeFromTargetTemperature(targetNumC);
+    el.dialFillSoftPath.setAttribute("stroke", RING_COLORS_SOFT[ringMode] || RING_COLORS_SOFT.comfort);
+    el.dialFillStrongPath.setAttribute("stroke", RING_COLORS_STRONG[ringMode] || RING_COLORS_STRONG.comfort);
+
     var currentAngle = ARC_START_DEG + currentRatio * ARC_SPAN_DEG;
     var currentPoint = polarToCartesian(currentAngle, ARC_RADIUS);
     el.dialCurrentDot.setAttribute("cx", currentPoint.x);

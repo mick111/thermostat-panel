@@ -209,9 +209,13 @@ body {
 
 .dial-fill-path {
   fill: none;
-  /* stroke: var(--ha-heat-soft); */
   stroke-width: 10;
   stroke-linecap: round;
+}
+
+.dial-fill-soft-path,
+.dial-fill-strong-path {
+  fill: none;
 }
 
 .dial-current-dot {
