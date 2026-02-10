@@ -295,6 +295,10 @@ body {
   color: var(--ha-heat);
 }
 
+.dial-mode-idle {
+  color: var(--ha-text-secondary);
+}
+
 .dial-target {
   margin: 0;
   font-size: 2.5rem;

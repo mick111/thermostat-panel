@@ -372,8 +372,12 @@
 
     var modeState = (state.state || "").toLowerCase();
     var hvacAction = (attrs.hvac_action || "").toLowerCase();
+    el.modeLabel.className = "dial-mode";
     if (hvacAction === "heating") el.modeLabel.textContent = t("modeHeating");
-    else if (hvacAction === "idle") el.modeLabel.textContent = t("modeIdle");
+    else if (hvacAction === "idle") {
+      el.modeLabel.textContent = t("modeIdle");
+      el.modeLabel.className += " dial-mode-idle";
+    }
     else if (hvacAction === "off") el.modeLabel.textContent = t("modeOff");
     else if (modeState === "heat") el.modeLabel.textContent = t("modeHeat");
     else if (modeState === "off") el.modeLabel.textContent = t("modeOff");
