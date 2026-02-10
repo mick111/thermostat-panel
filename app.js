@@ -11,7 +11,9 @@
     : CONFIG.baseUrl.replace(/\/$/, "");
   var token = (typeof CONFIG.token === "string" ? CONFIG.token : "").trim();
   var thermostatEntityId = CONFIG.thermostatEntityId;
-  var guestEntityId = CONFIG.guestEntityId;
+  var guestEntityId = CONFIG.guestEntityId || "sensor.guest_name";
+  var guestCountEntityId = CONFIG.guestCountEntityId || "sensor.guest_count";
+  var guestDatesEntityId = CONFIG.guestDatesEntityId || "sensor.guest_dates";
   var step = CONFIG.stepDegrees;
   var refreshInterval = CONFIG.refreshInterval;
   var ARC_START_DEG = 225;
@@ -66,6 +68,8 @@
       unitToggleTitle: "Switch between Celsius and Fahrenheit",
       welcomeDefault: "Welcome",
       welcomeWithName: "Welcome, {name}",
+      badgeGuestsTitle: "Guests",
+      badgeDatesTitle: "Arrival and departure dates",
       comfortMessageLine1: "Significant environmental impact",
       comfortMessageLine2: "Let's think about our planet"
     },
@@ -94,6 +98,8 @@
       unitToggleTitle: "Basculer entre Celsius et Fahrenheit",
       welcomeDefault: "Bienvenue",
       welcomeWithName: "Bienvenue, {name}",
+      badgeGuestsTitle: "Nombre de guests",
+      badgeDatesTitle: "Dates d'arrivée et de départ",
       comfortMessageLine1: "Impact environnemental important",
       comfortMessageLine2: "Pensons à notre planète"
     },
@@ -122,6 +128,8 @@
       unitToggleTitle: "Alternar entre Celsius y Fahrenheit",
       welcomeDefault: "Bienvenido/a",
       welcomeWithName: "Bienvenido/a, {name}",
+      badgeGuestsTitle: "Número de huéspedes",
+      badgeDatesTitle: "Fechas de llegada y salida",
       comfortMessageLine1: "Impacto ambiental importante",
       comfortMessageLine2: "Pensemos en nuestro planeta"
     },
@@ -150,6 +158,8 @@
       unitToggleTitle: "在摄氏度和华氏度之间切换",
       welcomeDefault: "欢迎",
       welcomeWithName: "欢迎，{name}",
+      badgeGuestsTitle: "住客人数",
+      badgeDatesTitle: "入住与离开日期",
       comfortMessageLine1: "环境影响重大",
       comfortMessageLine2: "让我们一起关心我们的地球"
     }
@@ -185,7 +195,11 @@
     labelPresetComfort: document.getElementById("labelPresetComfort"),
     comfortMessage: document.getElementById("comfortMessage"),
     comfortMessageLine1: document.getElementById("comfortMessageLine1"),
-    comfortMessageLine2: document.getElementById("comfortMessageLine2")
+    comfortMessageLine2: document.getElementById("comfortMessageLine2"),
+    guestCountBadge: document.getElementById("guestCountBadge"),
+    guestDatesBadge: document.getElementById("guestDatesBadge"),
+    guestCountValue: document.getElementById("guestCountValue"),
+    guestDatesValue: document.getElementById("guestDatesValue")
   };
 
   var currentState = null;
@@ -194,6 +208,8 @@
   var displayUnit = "C";
   var backendTempUnit = "C";
   var currentGuestName = "";
+  var currentGuestCount = "—";
+  var currentGuestDates = "—";
   var lastStatusType = "loading";
   var lastStatusErrorMessage = "";
 
@@ -229,13 +245,32 @@
     return Math.round(value * 2) / 2;
   }
 
-  function normalizeGuestName(value) {
+  function normalizeEntityValue(value) {
     var text = String(value == null ? "" : value).trim();
     var lower = text.toLowerCase();
     if (!text || lower === "unknown" || lower === "unavailable" || lower === "none" || lower === "null") {
       return "";
     }
     return text;
+  }
+
+  function normalizeGuestName(value) {
+    return normalizeEntityValue(value);
+  }
+
+  function normalizeGuestCount(value) {
+    var text = normalizeEntityValue(value);
+    return text || "—";
+  }
+
+  function normalizeGuestDatesFromState(entityState) {
+    var stateText = normalizeEntityValue(entityState && entityState.state);
+    if (stateText) return stateText;
+    var attrs = entityState && entityState.attributes ? entityState.attributes : {};
+    var arrival = normalizeEntityValue(attrs.arrival_date || attrs.check_in || attrs.checkin || attrs.start_date || attrs.start || attrs.from);
+    var departure = normalizeEntityValue(attrs.departure_date || attrs.check_out || attrs.checkout || attrs.end_date || attrs.end || attrs.to);
+    if (arrival && departure) return arrival + " - " + departure;
+    return arrival || departure || "—";
   }
 
   function renderWelcomeMessage() {
@@ -245,6 +280,11 @@
     } else {
       el.welcomeMessage.textContent = t("welcomeDefault");
     }
+  }
+
+  function renderGuestBadges() {
+    if (el.guestCountValue) el.guestCountValue.textContent = currentGuestCount || "—";
+    if (el.guestDatesValue) el.guestDatesValue.textContent = currentGuestDates || "—";
   }
 
   function setStatus(text, className) {
@@ -414,18 +454,52 @@
     });
   }
 
-  function loadGuestName(callback) {
-    if (!guestEntityId) {
-      if (callback) callback(null, "");
+  function loadEntityState(entityId, callback) {
+    if (!entityId) {
+      if (callback) callback(null, null);
       return;
     }
-    apiRequest("GET", "/api/states/" + encodeURIComponent(guestEntityId), null, function (err, data) {
+    apiRequest("GET", "/api/states/" + encodeURIComponent(entityId), null, function (err, data) {
+      if (err) {
+        if (callback) callback(err, null);
+        return;
+      }
+      if (callback) callback(null, data);
+    });
+  }
+
+  function loadGuestName(callback) {
+    loadEntityState(guestEntityId, function (err, data) {
       if (err) {
         if (callback) callback(err, "");
         return;
       }
       var guestName = normalizeGuestName(data && data.state);
       if (callback) callback(null, guestName);
+    });
+  }
+
+  function loadGuestBadges(callback) {
+    var pending = 2;
+    function done() {
+      pending -= 1;
+      if (pending <= 0 && callback) callback();
+    }
+
+    loadEntityState(guestCountEntityId, function (err, data) {
+      if (!err && data) {
+        currentGuestCount = normalizeGuestCount(data.state);
+      }
+      renderGuestBadges();
+      done();
+    });
+
+    loadEntityState(guestDatesEntityId, function (err, data) {
+      if (!err && data) {
+        currentGuestDates = normalizeGuestDatesFromState(data);
+      }
+      renderGuestBadges();
+      done();
     });
   }
 
@@ -581,9 +655,18 @@
       el.btnUnitToggle.setAttribute("aria-label", t("unitToggleAria"));
       el.btnUnitToggle.setAttribute("title", t("unitToggleTitle"));
     }
+    if (el.guestCountBadge) {
+      el.guestCountBadge.setAttribute("title", t("badgeGuestsTitle"));
+      el.guestCountBadge.setAttribute("aria-label", t("badgeGuestsTitle"));
+    }
+    if (el.guestDatesBadge) {
+      el.guestDatesBadge.setAttribute("title", t("badgeDatesTitle"));
+      el.guestDatesBadge.setAttribute("aria-label", t("badgeDatesTitle"));
+    }
     if (el.comfortMessageLine1) el.comfortMessageLine1.textContent = t("comfortMessageLine1");
     if (el.comfortMessageLine2) el.comfortMessageLine2.textContent = t("comfortMessageLine2");
     renderWelcomeMessage();
+    renderGuestBadges();
 
     updateUnitToggleButton();
     updateLanguageButtons();
@@ -615,6 +698,7 @@
         currentGuestName = guestName;
         renderWelcomeMessage();
       });
+      loadGuestBadges();
     });
   }
 

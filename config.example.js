@@ -18,6 +18,12 @@ var CONFIG = {
   // Guest name entity ID (state contains current guest name)
   guestEntityId: "sensor.guest_name",
 
+  // Guest count entity ID (state contains current number of guests)
+  guestCountEntityId: "sensor.guest_count",
+
+  // Guest dates entity ID (state contains arrival/departure range)
+  guestDatesEntityId: "sensor.guest_dates",
+
   // Temperature step for +/- buttons (degrees)
   stepDegrees: 0.5,
 

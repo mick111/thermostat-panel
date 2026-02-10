@@ -69,7 +69,7 @@ body {
 }
 
 .status {
-  margin: 0.4rem 0 0;
+  margin: 0;
   font-size: 0.8125rem;
   color: var(--ha-text-secondary);
 }
@@ -87,7 +87,7 @@ body {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  max-width: 52%;
+  max-width: 50%;
   font-size: 0.95rem;
   font-weight: 500;
   text-align: center;
@@ -96,6 +96,49 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   pointer-events: none;
+}
+
+.guest-badges {
+  margin-top: 0.45rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+}
+
+.guest-badge {
+  min-width: 6.5rem;
+  max-width: 100%;
+  height: 2.55rem;
+  padding: 0 0.8rem;
+  border-radius: 999px;
+  border: 1px solid #cfd8dc;
+  background: #f7f9fb;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ha-text);
+  box-shadow: 0 1px 2px var(--ha-shadow);
+}
+
+.guest-badge-dates {
+  min-width: 13rem;
+}
+
+.guest-badge-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  fill: #039be5;
+  flex: 0 0 auto;
+}
+
+.guest-badge-value {
+  min-width: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-refresh {
@@ -542,9 +585,29 @@ body {
   border-top: 1px solid var(--ha-divider);
   font-size: 0.75rem;
   color: var(--ha-text-secondary);
-  text-align: center;
 }
 
-.footer p {
+.footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.footer-row p {
   margin: 0;
+}
+
+.footer-row .status {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footer-row #lastUpdate {
+  flex-shrink: 0;
+  text-align: right;
 }
