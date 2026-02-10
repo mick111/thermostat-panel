@@ -199,6 +199,10 @@
     return (value - 32) * 5 / 9;
   }
 
+  function roundToHalf(value) {
+    return Math.round(value * 2) / 2;
+  }
+
   function setStatus(text, className) {
     el.status.textContent = text;
     el.status.className = "status " + (className || "");
@@ -241,11 +245,14 @@
     }
   }
 
-  function formatTemp(value, sourceUnit) {
+  function formatTemp(value, sourceUnit, options) {
     if (value == null || value === "") return "—";
     var n = parseFloat(value, 10);
     if (isNaN(n)) return "—";
     var converted = convertTemperature(n, sourceUnit || backendTempUnit, displayUnit);
+    if (options && options.roundHalfInF && displayUnit === "F") {
+      converted = roundToHalf(converted);
+    }
     var temp = converted.toFixed(1);
     if (currentLang !== "en") temp = temp.replace(".", ",");
     return temp + "°" + displayUnit;
@@ -358,7 +365,7 @@
     var target = attrs.temperature;
 
     el.currentTemp.textContent = formatTemp(current, tempUnit);
-    el.targetTemp.textContent = formatTemp(target, tempUnit);
+    el.targetTemp.textContent = formatTemp(target, tempUnit, { roundHalfInF: true });
     el.lastUpdate.textContent = t("lastUpdatePrefix") + formatTime(state.last_updated);
 
     var modeState = (state.state || "").toLowerCase();
