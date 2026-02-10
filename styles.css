@@ -139,6 +139,7 @@ html, body {
   margin-bottom: 1rem;
 }
 
+/* Ring track: thin ring, same size as wrap (square) */
 .dial-bg {
   position: absolute;
   top: 0;
@@ -148,11 +149,12 @@ html, body {
   padding-bottom: 100%;
   border-radius: 50%;
   box-sizing: border-box;
-  border: 10px solid var(--ha-divider);
+  border: 6px solid var(--ha-divider);
   background: transparent;
   z-index: 0;
 }
 
+/* Orange arc: ring with hole so it matches track thickness (inner 38% = hole) */
 .dial-fill {
   position: absolute;
   top: 0;
@@ -163,7 +165,6 @@ html, body {
   border-radius: 50%;
   box-sizing: border-box;
   --dial-angle: 0deg;
-  /* Arc from 225deg (bottom-left) clockwise 270deg */
   background: conic-gradient(
     from 225deg,
     var(--ha-heat-soft) 0deg,
@@ -171,44 +172,40 @@ html, body {
     transparent var(--dial-angle),
     transparent 270deg
   );
-  -webkit-mask: radial-gradient(circle, transparent 32%, black 32%);
-  mask: radial-gradient(circle, transparent 32%, black 32%);
+  -webkit-mask: radial-gradient(circle, transparent 38%, black 38%);
+  mask: radial-gradient(circle, transparent 38%, black 38%);
   z-index: 0;
 }
 
+/* Inner circle: centered in the wrap, large so the ring stays thin */
 .dial-center {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 64%;
-  padding-bottom: 64%;
+  width: 76%;
+  padding-bottom: 76%;
   height: 0;
-  margin: -32% 0 0 -32%;
+  margin: -38% 0 0 -38%;
   background: var(--ha-surface);
   border-radius: 50%;
   box-shadow: 0 2px 8px var(--ha-shadow);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   padding: 0;
   box-sizing: content-box;
   z-index: 1;
 }
 
+/* Text block: truly centered in the circle */
 .dial-center-inner {
   position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  text-align: center;
 }
 
 .dial-center .dial-mode,
 .dial-center .dial-target {
-  position: relative;
   margin: 0;
   text-align: center;
   z-index: 1;
