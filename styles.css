@@ -329,14 +329,14 @@ body {
   width: 3rem;
   height: 3rem;
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   padding: 0;
   border-radius: 50%;
   border: 1px solid var(--ha-divider);
   background: var(--ha-surface);
   color: var(--ha-text);
+  font-size: 0;
+  line-height: 0;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
@@ -346,10 +346,13 @@ body {
 }
 
 .btn-icon {
-  position: relative;
-  display: block;
-  width: 1.15rem;
-  height: 1.15rem;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
   color: #606060;
 }
 
@@ -357,16 +360,17 @@ body {
 .btn-icon::after {
   content: "";
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   background: currentColor;
   border-radius: 2px;
 }
 
 .btn-icon-minus::before {
-  width: 1.05rem;
-  height: 0.16rem;
+  left: 50%;
+  top: 50%;
+  width: 16px;
+  height: 2px;
+  margin-left: -8px;
+  margin-top: -1px;
 }
 
 .btn-icon-minus::after {
@@ -374,13 +378,21 @@ body {
 }
 
 .btn-icon-plus::before {
-  width: 1.05rem;
-  height: 0.16rem;
+  left: 50%;
+  top: 50%;
+  width: 16px;
+  height: 2px;
+  margin-left: -8px;
+  margin-top: -1px;
 }
 
 .btn-icon-plus::after {
-  width: 0.16rem;
-  height: 1.05rem;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 16px;
+  margin-left: -1px;
+  margin-top: -8px;
 }
 
 .btn-round:active {
