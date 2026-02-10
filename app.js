@@ -22,11 +22,18 @@
     comfort: 20,
     activity: 21
   };
-  var RING_COLORS = {
+  var RING_COLORS_SOFT = {
     away: "#e1bee7",
     eco: "#c8e6c9",
     comfort: "#bbdefb",
     activity: "#ffe0b2",
+    over: "#ffcdd2"
+  };
+  var RING_COLORS_STRONG = {
+    away: "#7b1fa2",
+    eco: "#388e3c",
+    comfort: "#1976d2",
+    activity: "#ef6c00",
     over: "#c62828"
   };
   var LANG_STORAGE_KEY = "thermostat-panel-lang";
@@ -386,16 +393,19 @@
     var minT = attrs.min_temp != null ? parseFloat(attrs.min_temp, 10) : 5;
     var maxT = attrs.max_temp != null ? parseFloat(attrs.max_temp, 10) : 35;
     var targetNum = target != null ? parseFloat(target, 10) : minT;
+    var currentNum = current != null ? parseFloat(current, 10) : targetNum;
+    if (isNaN(currentNum)) currentNum = targetNum;
     var targetRatio = maxT > minT ? clamp01((targetNum - minT) / (maxT - minT)) : 0;
     var targetDelta = targetRatio * ARC_SPAN_DEG;
     var visibleTargetDelta = targetRatio <= 0 ? 0.75 : targetDelta;
     el.dialTrackPath.setAttribute("d", describeArc(ARC_START_DEG, ARC_SPAN_DEG, ARC_RADIUS));
     el.dialFillPath.setAttribute("d", describeArc(ARC_START_DEG, visibleTargetDelta, ARC_RADIUS));
     var targetNumC = convertTemperature(targetNum, tempUnit, "C");
+    var currentNumC = convertTemperature(currentNum, tempUnit, "C");
     var ringMode = modeFromTargetTemperature(targetNumC);
-    el.dialFillPath.setAttribute("stroke", RING_COLORS[ringMode] || RING_COLORS.comfort);
+    var ringPalette = targetNumC > currentNumC ? RING_COLORS_STRONG : RING_COLORS_SOFT;
+    el.dialFillPath.setAttribute("stroke", ringPalette[ringMode] || ringPalette.comfort);
 
-    var currentNum = current != null ? parseFloat(current, 10) : minT;
     var currentRatio = maxT > minT ? clamp01((currentNum - minT) / (maxT - minT)) : 0;
     var currentAngle = ARC_START_DEG + currentRatio * ARC_SPAN_DEG;
     var currentPoint = polarToCartesian(currentAngle, ARC_RADIUS);
