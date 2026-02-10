@@ -330,7 +330,7 @@ body {
 
 .btn-round {
   width: 4rem;
-  aspect-ratio: 1;
+  height: 4rem;
   position: relative;
   display: block;
   padding: 0;
