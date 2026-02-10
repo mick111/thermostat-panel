@@ -1,52 +1,52 @@
-# Copier le panneau vers le dossier www de Home Assistant
+# Copying the panel to Home Assistant’s www folder
 
-**Important :** La page que vous ouvrez (`https://echiquier.duckdns.org:48123/local/thermostat-panel/`) est servie par Home Assistant. Le navigateur charge donc les fichiers **présents sur le Pi** (dans `config/www/thermostat-panel/`), **pas** ceux de votre Mac.  
-→ Si vous modifiez `config.js` (token, entity_id, etc.) **sur votre Mac**, vous devez **recopier** ce fichier vers le Pi pour que le changement soit pris en compte. Rechargez la page après la copie.
-
----
-
-Vous n’avez pas accès à la racine dans File Editor : utilisez l’une des méthodes ci-dessous.
+**Important:** The page you open (`https://echiquier.duckdns.org:48123/local/thermostat-panel/`) is served by Home Assistant. The browser therefore loads the files **on the Pi** (in `config/www/thermostat-panel/`), **not** the ones on your Mac.  
+→ If you change `config.js` (token, entity_id, etc.) **on your Mac**, you must **copy** that file to the Pi again for the change to take effect. Reload the page after copying.
 
 ---
 
-## Option A : Samba (recommandé si vous êtes sur le même réseau)
+You don’t have access to the root in File Editor: use one of the methods below.
 
-1. **Sur le Pi** : Add-ons → **Samba share** → Démarrer (activer « Démarrage au boot » si besoin).
-2. **Sur le Mac** : Finder → menu **Aller** → **Aller vers le serveur** (ou ⌘K).
-3. Saisir l’**IP locale du Raspberry Pi** (pas Duck DNS), par exemple :
+---
+
+## Option A: Samba (recommended if you’re on the same network)
+
+1. **On the Pi**: Add-ons → **Samba share** → Start (enable “Start on boot” if needed).
+2. **On the Mac**: Finder → **Go** menu → **Connect to Server** (or ⌘K).
+3. Enter the **Raspberry Pi’s local IP** (not Duck DNS), for example:
    ```text
    smb://192.168.1.XX
    ```
-   (Trouver l’IP : Paramètres HA → Système → Réseau, ou dans votre box.)
-4. Se connecter au partage **config** (identifiants éventuels selon votre réglage Samba).
-5. Dans le dossier ouvert, créer le dossier **www** s’il n’existe pas.
-6. Ouvrir **www**, créer le dossier **thermostat-panel**.
-7. Copier-coller **depuis votre Mac** les 4 fichiers du dossier `thermostat-panel` vers **config/www/thermostat-panel/** :
+   (Find the IP: HA Settings → System → Network, or from your router.)
+4. Connect to the **config** share (credentials as per your Samba setup).
+5. In the opened folder, create the **www** folder if it doesn’t exist.
+6. Open **www**, create the **thermostat-panel** folder.
+7. Copy **from your Mac** the 4 files from the `thermostat-panel` folder into **config/www/thermostat-panel/**:
    - `index.html`
    - `styles.css`
    - `app.js`
    - `config.js`
 
-L’URL du panneau sera : **https://echiquier.duckdns.org:48123/local/thermostat-panel/**
+The panel URL will be: **https://echiquier.duckdns.org:48123/local/thermostat-panel/**
 
 ---
 
-## Option B : Copie en ligne de commande (SSH / SCP)
+## Option B: Command line copy (SSH / SCP)
 
-Il faut que l’add-on **SSH** (ou un accès SSH au Pi) soit activé.
+The **SSH** add-on (or SSH access to the Pi) must be enabled.
 
-1. **Sur le Pi** : Add-ons → **SSH** → Configurer (notez le **port**, souvent 22 ou 22222) → Démarrer.
-2. **Sur le Mac** : ouvrir le Terminal et lancer :
+1. **On the Pi**: Add-ons → **SSH** → Configure (note the **port**, often 22 or 22222) → Start.
+2. **On the Mac**: open Terminal and run:
 
 ```bash
-# Remplacer 192.168.1.XX par l’IP locale du Pi, et 22 par le port SSH si différent
+# Replace 192.168.1.XX with the Pi’s local IP, and 22 with the SSH port if different
 export HA_HOST="192.168.1.XX"
 export HA_SSH_PORT="22"
 
-# Créer le dossier sur le Pi
+# Create the folder on the Pi
 ssh -p "$HA_SSH_PORT" root@$HA_HOST "mkdir -p /config/www/thermostat-panel"
 
-# Copier les 4 fichiers (adapter le chemin du projet si besoin)
+# Copy the 4 files (adjust project path if needed)
 scp -P "$HA_SSH_PORT" /Users/mick111/Documents/Projets/thermostat-panel/index.html \
   /Users/mick111/Documents/Projets/thermostat-panel/styles.css \
   /Users/mick111/Documents/Projets/thermostat-panel/app.js \
@@ -54,7 +54,7 @@ scp -P "$HA_SSH_PORT" /Users/mick111/Documents/Projets/thermostat-panel/index.ht
   root@$HA_HOST:/config/www/thermostat-panel/
 ```
 
-Ou en une seule ligne (adapter IP et port) :
+Or in one line (adjust IP and port):
 
 ```bash
 ssh -p 22 root@192.168.1.XX "mkdir -p /config/www/thermostat-panel" && scp -P 22 /Users/mick111/Documents/Projets/thermostat-panel/{index.html,styles.css,app.js,config.js} root@192.168.1.XX:/config/www/thermostat-panel/
@@ -62,13 +62,13 @@ ssh -p 22 root@192.168.1.XX "mkdir -p /config/www/thermostat-panel" && scp -P 22
 
 ---
 
-## Option C : File Editor (si vous voyez configuration.yaml)
+## Option C: File Editor (if you see configuration.yaml)
 
-Si dans File Editor vous voyez des fichiers comme **configuration.yaml** à la racine de ce qui s’affiche :
+If in File Editor you see files like **configuration.yaml** at the root of what’s displayed:
 
-1. Vous êtes déjà dans **config**. Créez un dossier **www** (bouton « Nouveau dossier »).
-2. Ouvrez **www**, créez **thermostat-panel**.
-3. Ouvrez **thermostat-panel**, puis créez 4 fichiers : `index.html`, `styles.css`, `app.js`, `config.js`.
-4. Copiez-collez le contenu de chaque fichier depuis votre projet sur le Mac (dossier `thermostat-panel`).
+1. You’re already in **config**. Create a **www** folder (e.g. “New folder” button).
+2. Open **www**, create **thermostat-panel**.
+3. Open **thermostat-panel**, then create 4 files: `index.html`, `styles.css`, `app.js`, `config.js`.
+4. Copy-paste the contents of each file from your project on the Mac (thermostat-panel folder).
 
-Si vous ne voyez pas `configuration.yaml` et ne pouvez pas remonter au niveau au-dessus, utilisez l’option A (Samba) ou B (SCP).
+If you don’t see `configuration.yaml` and can’t go up a level, use Option A (Samba) or B (SCP).

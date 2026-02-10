@@ -48,7 +48,7 @@
     if (!isoString) return "—";
     try {
       var d = new Date(isoString);
-      return d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      return d.toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
     } catch (e) {
       return "—";
     }
@@ -74,14 +74,14 @@
       } else {
         var msg = "HTTP " + status + (response && response.message ? " — " + response.message : "");
         if (status === 401) {
-          msg += ". Vérifiez le token dans config.js (Profil HA → Créer un jeton) et que baseUrl pointe bien vers Home Assistant.";
+          msg += " Check the token in config.js (HA Profile → Create token) and that baseUrl points to Home Assistant.";
         }
         callback(new Error(msg), null);
       }
     };
 
     xhr.onerror = function () {
-      callback(new Error("Réseau indisponible"), null);
+      callback(new Error("Network unavailable"), null);
     };
 
     if (body && (method === "POST" || method === "PUT")) {
@@ -111,7 +111,7 @@
 
     el.currentTemp.textContent = formatTemp(current);
     el.targetTemp.textContent = formatTemp(target);
-    el.lastUpdate.textContent = "Dernière mise à jour : " + formatTime(state.last_updated);
+    el.lastUpdate.textContent = "Last update: " + formatTime(state.last_updated);
 
     var modeState = (state.state || "").toLowerCase();
     el.mode.textContent = modeState || "—";
@@ -132,15 +132,15 @@
 
   function refresh() {
     if (!token || token === "VOTRE_TOKEN_ICI") {
-      setStatus("Configurez le token dans config.js (Profil HA → Créer un jeton)", "error");
+      setStatus("Set the token in config.js (HA Profile → Create token)", "error");
       return;
     }
     loadState(function (err, state) {
       if (err) {
-        setStatus("Erreur : " + err.message, "error");
+        setStatus("Error: " + err.message, "error");
         return;
       }
-      setStatus("Connecté", "connected");
+      setStatus("Connected", "connected");
       updateUI(state);
     });
   }
@@ -152,7 +152,7 @@
     }, function (err) {
       if (done) done(err);
       if (err) {
-        setStatus("Erreur : " + err.message, "error");
+        setStatus("Error: " + err.message, "error");
       } else {
         refresh();
       }
@@ -166,7 +166,7 @@
     }, function (err) {
       if (done) done(err);
       if (err) {
-        setStatus("Erreur : " + err.message, "error");
+        setStatus("Error: " + err.message, "error");
       } else {
         refresh();
       }

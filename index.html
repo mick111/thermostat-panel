@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
   <title>Thermostat</title>
-  <!-- Incrémenter ?v= après chaque déploiement pour forcer le rechargement (écran d'accueil, cache) -->
+  <!-- Bump ?v= after each deploy to force reload (home screen, cache) -->
   <link rel="stylesheet" href="styles.css?v=1">
 </head>
 <body>
@@ -18,23 +18,23 @@
     <header class="header">
       <h1>Thermostat</h1>
       <div class="status-row">
-        <p id="status" class="status">Chargement…</p>
-        <button type="button" id="btnRefresh" class="btn btn-refresh" aria-label="Rafraîchir la page" title="Rafraîchir">Rafraîchir</button>
+        <p id="status" class="status">Loading…</p>
+        <button type="button" id="btnRefresh" class="btn btn-refresh" aria-label="Refresh page" title="Refresh">Refresh</button>
       </div>
     </header>
 
     <main class="main">
       <section class="card temp-card">
-        <h2>Température actuelle</h2>
+        <h2>Current temperature</h2>
         <p id="currentTemp" class="big-value">--</p>
       </section>
 
       <section class="card target-card">
-        <h2>Consigne</h2>
+        <h2>Setpoint</h2>
         <div class="target-row">
-          <button type="button" id="btnDown" class="btn btn-round" aria-label="Baisser">−</button>
+          <button type="button" id="btnDown" class="btn btn-round" aria-label="Decrease">−</button>
           <p id="targetTemp" class="big-value">--</p>
-          <button type="button" id="btnUp" class="btn btn-round" aria-label="Monter">+</button>
+          <button type="button" id="btnUp" class="btn btn-round" aria-label="Increase">+</button>
         </div>
       </section>
 
@@ -42,10 +42,10 @@
         <h2>Mode</h2>
         <p id="mode" class="mode-value">--</p>
         <div class="buttons-row">
-          <button type="button" id="btnHeat" class="btn btn-mode">Chauffage</button>
-          <button type="button" id="btnCool" class="btn btn-mode">Climatisation</button>
+          <button type="button" id="btnHeat" class="btn btn-mode">Heat</button>
+          <button type="button" id="btnCool" class="btn btn-mode">Cool</button>
           <button type="button" id="btnAuto" class="btn btn-mode">Auto</button>
-          <button type="button" id="btnOff" class="btn btn-mode">Arrêt</button>
+          <button type="button" id="btnOff" class="btn btn-mode">Off</button>
         </div>
       </section>
     </main>

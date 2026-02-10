@@ -1,36 +1,36 @@
-# Sécurité et token
+# Security and token
 
-## Le token est visible côté client
+## The token is visible client-side
 
-Le fichier **config.js** est envoyé tel quel au navigateur. Toute personne qui peut charger la page du panneau peut donc voir le token (affichage du code source, onglet Réseau des outils de développement, etc.). C’est une limite des applications web « statiques » qui appellent une API avec un jeton dans le frontend.
+The **config.js** file is sent as-is to the browser. Anyone who can load the panel page can therefore see the token (view source, Network tab in dev tools, etc.). This is a limitation of static web apps that call an API with a token in the frontend.
 
-## Mesures recommandées
+## Recommended measures
 
-1. **Limiter l’accès à l’URL du panneau**
-   - Réserver le panneau à votre réseau local (Wi‑Fi maison, VPN) si possible.
-   - Éviter de partager le lien publiquement.
+1. **Restrict access to the panel URL**
+   - Keep the panel on your local network (home Wi‑Fi, VPN) when possible.
+   - Avoid sharing the link publicly.
 
-2. **Utiliser un jeton dédié**
-   - Créez un **Long-Lived Access Token** réservé au panneau (Profil HA → Créer un jeton, nom ex. « Thermostat panel »).
-   - En cas de fuite ou de doute, révoquez ce jeton dans Home Assistant et recréez-en un.
+2. **Use a dedicated token**
+   - Create a **Long-Lived Access Token** reserved for the panel (HA Profile → Create token, name e.g. “Thermostat panel”).
+   - If it is leaked or you have doubts, revoke that token in Home Assistant and create a new one.
 
-3. **Droits minimaux**
-   - Le compte HA associé au jeton peut être un utilisateur avec uniquement les droits nécessaires (accès aux entités climate concernées), pour limiter la portée en cas de compromission. Voir la section *Limiter les droits d’un utilisateur HA* ci‑dessous.
+3. **Least privilege**
+   - The HA account tied to the token can be a user with only the required permissions (access to the relevant climate entities), to limit impact if compromised. See the *Limiting an HA user’s access to certain entities* section below.
 
-4. **Ne pas committer le token**
-   - Gardez votre vrai `config.js` (avec le token) hors du dépôt Git. Utilisez `config.example.js` comme modèle et ajoutez `config.js` dans `.gitignore` si vous versionnez le projet.
+4. **Do not commit the token**
+   - Keep your real `config.js` (with the token) out of the Git repo. Use `config.example.js` as a template and add `config.js` to `.gitignore` if you version the project.
 
-## Limiter les droits d’un utilisateur HA à certaines entités
+## Limiting an HA user’s access to certain entities
 
-Home Assistant permet d’associer des utilisateurs à des **groupes** dont la **politique** (policy) définit quelles entités ils peuvent lire ou contrôler. En pratique :
+Home Assistant lets you assign users to **groups** whose **policy** defines which entities they can read or control. In practice:
 
-- **Paramètres → Personnes et accès → Utilisateurs** : créez un utilisateur dédié au panneau (ou utilisez un compte existant non‑propriétaire).
-- Le **propriétaire** (owner) a toujours tous les droits ; les restrictions ne s’appliquent qu’aux autres comptes.
-- Les permissions sont portées par des **groupes**. Un utilisateur peut appartenir à un ou plusieurs groupes (ex. `system-users` = utilisateur standard). Les politiques des groupes sont fusionnées (si un groupe autorise une entité, l’utilisateur l’a).
+- **Settings → People & access → Users**: create a user dedicated to the panel (or use an existing non-owner account).
+- The **owner** always has full access; restrictions apply only to other accounts.
+- Permissions are defined by **groups**. A user can belong to one or more groups (e.g. `system-users` = standard user). Group policies are merged (if any group allows an entity, the user has access).
 
-### Structure des politiques (pour utilisateurs avancés)
+### Policy structure (for advanced users)
 
-Les politiques sont des dictionnaires JSON. Exemple pour n’autoriser que la lecture et le contrôle du thermostat :
+Policies are JSON objects. Example to allow only reading and controlling the thermostat:
 
 ```json
 {
@@ -42,18 +42,18 @@ Les politiques sont des dictionnaires JSON. Exemple pour n’autoriser que la le
 }
 ```
 
-Vous pouvez aussi autoriser tout un **domaine** (ex. `climate`) avec `"domains": { "climate": true }`, ou cibler des **zones** (`area_ids`) ou **appareils** (`device_ids`).
+You can also allow a whole **domain** (e.g. `climate`) with `"domains": { "climate": true }`, or target **areas** (`area_ids`) or **devices** (`device_ids`).
 
-### Où configurer
+### Where to configure
 
-- **Interface** : selon votre version de HA, une partie de la gestion des groupes/utilisateurs peut être dans **Paramètres → Personnes et accès** (onglet Utilisateurs, puis groupe de l’utilisateur). Le détail des politiques (entity_ids, domains, etc.) n’est pas toujours exposé dans l’UI.
-- **Fichiers** : les groupes et leurs politiques sont stockés dans le répertoire de configuration HA, dans `.storage/auth` (et liés aux utilisateurs). Modifier ces fichiers à la main est possible mais délicat ; faites une sauvegarde et consultez la [doc développeur sur les permissions](https://developers.home-assistant.io/docs/auth_permissions).
-- **Auth provider « Command line »** : si vous authentifiez des utilisateurs via un script (auth provider `command_line`), vous pouvez renvoyer `group: system-users` pour en faire un utilisateur non‑admin ; les politiques détaillées restent à définir côté groupes dans HA.
+- **UI**: Depending on your HA version, some group/user management may be under **Settings → People & access** (Users tab, then the user’s group). The full policy detail (entity_ids, domains, etc.) is not always exposed in the UI.
+- **Files**: Groups and their policies are stored in the HA config directory, in `.storage/auth` (and linked to users). Editing these files by hand is possible but delicate; back them up and check the [developer docs on permissions](https://developers.home-assistant.io/docs/auth_permissions).
+- **Command line auth provider**: If you authenticate users via a script (auth provider `command_line`), you can output `group: system-users` to make them a non-admin user; detailed policies still need to be defined in HA groups.
 
-Une fois un utilisateur restreint à certaines entités, créez un **Long-Lived Access Token** depuis *son* profil (et non celui du propriétaire) et utilisez ce jeton dans le panneau. Si le token fuit, l’attaquant ne pourra agir que sur les entités autorisées pour ce compte.
+Once a user is restricted to certain entities, create a **Long-Lived Access Token** from *their* profile (not the owner’s) and use that token in the panel. If the token leaks, the attacker will only be able to act on the entities allowed for that account.
 
-**Note** : la doc officielle indique que les comptes non‑propriétaires ont, pour l’instant, le même accès que le propriétaire ; les restrictions par groupe/politique sont en cours d’évolution. Vérifiez le comportement sur votre version et les [release notes](https://www.home-assistant.io/blog/).
+**Note**: The official docs state that non-owner accounts currently have the same access as the owner; group/policy restrictions are still evolving. Check behaviour on your version and the [release notes](https://www.home-assistant.io/blog/).
 
-## Alternative (plus complexe)
+## Alternative (more complex)
 
-Pour ne pas exposer de token dans le navigateur, il faudrait faire passer les appels API par un petit serveur (proxy) qui stocke le token côté serveur et que le frontend appelle sans token. Cela sort du cadre de ce panneau minimaliste.
+To avoid exposing a token in the browser, you would need a small server (proxy) that holds the token and forwards API requests, with the frontend calling it without a token. That is outside the scope of this minimal panel.

@@ -1,35 +1,35 @@
-# Panneau thermostat Home Assistant (iPad kiosque)
+# Home Assistant thermostat panel (iPad kiosk)
 
-Application web minimaliste pour piloter un thermostat Home Assistant depuis un iPad en mode kiosque (mur). Compatible **iOS 9.3** (XMLHttpRequest, pas de fetch).
+Minimal web app to control a Home Assistant thermostat from an iPad in kiosk mode (wall mount). Compatible with **iOS 9.3** (XMLHttpRequest only, no fetch).
 
-## Fichiers
+## Files
 
-- **index.html** — Page principale (température, consigne, mode, boutons)
-- **styles.css** — Mise en page plein écran, tactile
-- **app.js** — Appels API Home Assistant (lecture état, set_temperature, set_hvac_mode)
-- **config.js** — À éditer : URL HA, token, entity_id du thermostat (le token est visible côté client, voir **SECURITE.md**)
-- **VERROUILLAGE.md** — Comment verrouiller l’iPad (Accès guidé + réglages)
+- **index.html** — Main page (temperature, setpoint, mode, buttons)
+- **styles.css** — Full-screen, touch-friendly layout
+- **app.js** — Home Assistant API calls (state read, set_temperature, set_hvac_mode)
+- **config.js** — Edit this: HA URL, token, thermostat entity_id (token is visible client-side; see **SECURITE.md**)
+- **VERROUILLAGE.md** — How to lock the iPad (Guided Access + settings)
 
 ## Configuration
 
-1. Éditer **config.js** :
-   - `baseUrl` : URL de Home Assistant (ex. `https://homeassistant.local:8123`)
-   - `token` : Long-Lived Access Token (Profil → Créer un jeton)
-   - `thermostatEntityId` : ex. `climate.salon`, `climate.thermostat`
-2. Servir les fichiers en HTTPS (obligatoire pour l’API depuis une page web). Possibilités :
-   - Module **http** de Home Assistant : ajouter le dossier dans `config/www/` et accéder via `https://VOTRE_HA:8123/local/thermostat-panel/`
-   - Ou tout autre serveur web (nginx, Apache, etc.) en HTTPS sur votre réseau
+1. Edit **config.js**:
+   - `baseUrl`: Home Assistant URL (e.g. `https://homeassistant.local:8123`)
+   - `token`: Long-Lived Access Token (Profile → Create token)
+   - `thermostatEntityId`: e.g. `climate.living_room`, `climate.thermostat`
+2. Serve the files over HTTPS (required for the API from a web page). Options:
+   - Home Assistant **http** module: add the folder to `config/www/` and access via `https://YOUR_HA:8123/local/thermostat-panel/`
+   - Or any other web server (nginx, Apache, etc.) over HTTPS on your network
 
-## Verrouillage iPad
+## iPad lock-down
 
-Pour que l’iPad ne soit utilisable que pour ce panneau : **Accès guidé** (Réglages → Accessibilité). Détails dans **VERROUILLAGE.md**.
+To restrict the iPad to this panel only: **Guided Access** (Settings → Accessibility). Details in **VERROUILLAGE.md**.
 
-## Prérequis Home Assistant
+## Home Assistant requirements
 
-- API REST activée (par défaut avec le frontend)
-- Entité **climate** pour le thermostat
-- Token avec droits d’appel de services
+- REST API enabled (default with the frontend)
+- **climate** entity for the thermostat
+- Token with permission to call services
 
-## Mode « Auto »
+## “Auto” mode
 
-Si votre thermostat utilise le mode `heat_cool` au lieu de `auto`, modifier dans **app.js** la ligne du bouton Auto : remplacer `setHVACMode("auto")` par `setHVACMode("heat_cool")`.
+If your thermostat uses `heat_cool` instead of `auto`, change the Auto button in **app.js**: replace `setHVACMode("auto")` with `setHVACMode("heat_cool")`.

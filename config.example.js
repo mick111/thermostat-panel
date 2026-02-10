@@ -1,23 +1,23 @@
 /**
- * Configuration du panneau thermostat Home Assistant
- * À adapter selon votre installation.
+ * Home Assistant thermostat panel configuration
+ * Adjust for your setup.
  */
 
 var CONFIG = {
-  // URL de base pour l'API. "auto" = même origine que la page (votre cas avec /local/thermostat-panel/).
-  // Pour forcer l'URL HA : "https://echiquier.duckdns.org:48123"
+  // API base URL. "auto" = same origin as the page (e.g. with /local/thermostat-panel/).
+  // To force HA URL: "https://echiquier.duckdns.org:48123"
   baseUrl: "auto",
 
-  // Long-Lived Access Token (Profil HA > Créer un jeton).
-  // Attention : ce token est visible par quiconque peut charger la page. Voir SECURITE.md.
+  // Long-Lived Access Token (HA Profile → Create token).
+  // Warning: this token is visible to anyone who can load the page. See SECURITE.md.
   token: "VOTRE_TOKEN_ICI",
 
-  // Entity ID du thermostat (ex: climate.salon, climate.thermostat)
+  // Thermostat entity ID (e.g. climate.living_room, climate.thermostat)
   thermostatEntityId: "climate.thermostat",
 
-  // Pas de température pour les boutons +/-
+  // Temperature step for +/- buttons (degrees)
   stepDegrees: 0.5,
 
-  // Intervalle de rafraîchissement des données (ms)
+  // Data refresh interval (ms)
   refreshInterval: 10000
 };
