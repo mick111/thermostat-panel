@@ -13,8 +13,8 @@
   <meta name="mobile-web-app-capable" content="yes">
   <title>Thermostat</title>
   <!-- Bump app-version and ?v= in links/scripts after each deploy -->
-  <meta name="app-version" content="3">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <meta name="app-version" content="4">
+  <link rel="stylesheet" href="styles.css?v=4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -29,13 +29,20 @@
     <header class="header">
       <div class="status-row">
         <p id="status" class="status">Loading…</p>
-        <button type="button" id="btnRefresh" class="btn btn-refresh" aria-label="Refresh page" title="Refresh">Refresh</button>
+        <div class="header-controls">
+          <button type="button" id="btnRefresh" class="btn btn-refresh" aria-label="Refresh page" title="Refresh">Refresh</button>
+          <div class="lang-switch" role="group" aria-label="Language">
+            <button type="button" id="btnLangFr" class="btn btn-lang" data-lang="fr">FR</button>
+            <button type="button" id="btnLangEn" class="btn btn-lang" data-lang="en">EN</button>
+            <button type="button" id="btnLangEs" class="btn btn-lang" data-lang="es">ES</button>
+          </div>
+        </div>
       </div>
     </header>
 
     <main class="main">
       <section class="current-temp-section">
-        <h2 class="label">Current temperature</h2>
+        <h2 id="labelCurrentTemp" class="label">Current temperature</h2>
         <p id="currentTemp" class="current-temp-value">--</p>
       </section>
 
@@ -60,10 +67,10 @@
       </section>
 
       <section class="presets-row">
-        <button type="button" id="btnPresetAway" class="btn btn-preset btn-preset-away" title="Away"><span class="preset-icon" aria-hidden="true">🏠</span><span>Away</span></button>
-        <button type="button" id="btnPresetSleep" class="btn btn-preset btn-preset-sleep" title="Sleep"><span class="preset-icon" aria-hidden="true">🌙</span><span>Sleep</span></button>
-        <button type="button" id="btnPresetEco" class="btn btn-preset btn-preset-eco" title="Eco"><span class="preset-icon" aria-hidden="true">🌿</span><span>Eco</span></button>
-        <button type="button" id="btnPresetComfort" class="btn btn-preset btn-preset-comfort" title="Comfort"><span class="preset-icon" aria-hidden="true">🔥</span><span>Comfort</span></button>
+        <button type="button" id="btnPresetAway" class="btn btn-preset btn-preset-away" title="Away"><span class="preset-icon" aria-hidden="true">🏠</span><span id="labelPresetAway">Away</span></button>
+        <button type="button" id="btnPresetSleep" class="btn btn-preset btn-preset-sleep" title="Sleep"><span class="preset-icon" aria-hidden="true">🌙</span><span id="labelPresetSleep">Sleep</span></button>
+        <button type="button" id="btnPresetEco" class="btn btn-preset btn-preset-eco" title="Eco"><span class="preset-icon" aria-hidden="true">🌿</span><span id="labelPresetEco">Eco</span></button>
+        <button type="button" id="btnPresetComfort" class="btn btn-preset btn-preset-comfort" title="Comfort"><span class="preset-icon" aria-hidden="true">🔥</span><span id="labelPresetComfort">Comfort</span></button>
       </section>
 
       <p id="comfortMessage" class="comfort-message" role="status" aria-live="polite" style="display: none;">Please be reasonable with heating.<br>Merci d’être raisonnable sur le chauffage.</p>
@@ -74,8 +81,8 @@
     </footer>
   </div>
 
-  <script src="config.js?v=3"></script>
-  <script src="app.js?v=3"></script>
+  <script src="config.js?v=4"></script>
+  <script src="app.js?v=4"></script>
 </body>
 
 </html>

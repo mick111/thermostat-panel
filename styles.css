@@ -52,8 +52,14 @@ body {
 .status-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
-  flex-wrap: wrap;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .status {
@@ -89,6 +95,34 @@ body {
 .btn-refresh:active {
   background: #f5f5f5;
   box-shadow: 0 2px 4px var(--ha-shadow-hover);
+}
+
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn-lang {
+  min-width: 2.2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--ha-divider);
+  border-radius: 8px;
+  background: var(--ha-surface);
+  color: var(--ha-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.btn-lang.active {
+  border-color: var(--ha-accent);
+  color: #01579b;
+  background: #e1f5fe;
 }
 
 /* Main */

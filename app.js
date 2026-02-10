@@ -1,6 +1,6 @@
 /**
- * Panneau thermostat — appels API Home Assistant
- * Compatible iOS 9 (XMLHttpRequest uniquement, pas de fetch)
+ * Thermostat panel — Home Assistant API calls
+ * Compatible with old iOS (XMLHttpRequest only, no fetch)
  */
 
 (function () {
@@ -16,10 +16,87 @@
   var ARC_START_DEG = 225;
   var ARC_SPAN_DEG = 270;
   var ARC_RADIUS = 43;
+  var LANG_STORAGE_KEY = "thermostat-panel-lang";
+
+  var I18N = {
+    en: {
+      refresh: "Refresh",
+      refreshAria: "Refresh page",
+      statusLoading: "Loading…",
+      statusConnected: "Connected",
+      statusErrorPrefix: "Error: ",
+      statusTokenMissing: "Set the token in config.js (HA Profile → Create token)",
+      error401Hint: " Check the token in config.js (HA Profile → Create token) and that baseUrl points to Home Assistant.",
+      networkUnavailable: "Network unavailable",
+      labelCurrentTemperature: "Current temperature",
+      lastUpdatePrefix: "Last update: ",
+      modeHeating: "Heating",
+      modeIdle: "Idle",
+      modeOff: "Off",
+      modeHeat: "Heat",
+      presetAway: "Away",
+      presetSleep: "Sleep",
+      presetEco: "Eco",
+      presetComfort: "Comfort",
+      ariaDecrease: "Decrease",
+      ariaIncrease: "Increase",
+      comfortMessage: "Please be reasonable with heating."
+    },
+    fr: {
+      refresh: "Rafraîchir",
+      refreshAria: "Rafraîchir la page",
+      statusLoading: "Chargement…",
+      statusConnected: "Connecté",
+      statusErrorPrefix: "Erreur : ",
+      statusTokenMissing: "Configurez le token dans config.js (Profil HA → Créer un jeton)",
+      error401Hint: " Vérifiez le token dans config.js (Profil HA → Créer un jeton) et que baseUrl pointe bien vers Home Assistant.",
+      networkUnavailable: "Réseau indisponible",
+      labelCurrentTemperature: "Température actuelle",
+      lastUpdatePrefix: "Dernière mise à jour : ",
+      modeHeating: "Chauffe",
+      modeIdle: "Inactif",
+      modeOff: "Arrêt",
+      modeHeat: "Chauffage",
+      presetAway: "Absent",
+      presetSleep: "Sommeil",
+      presetEco: "Éco",
+      presetComfort: "Confort",
+      ariaDecrease: "Baisser",
+      ariaIncrease: "Monter",
+      comfortMessage: "Merci d’être raisonnable sur le chauffage."
+    },
+    es: {
+      refresh: "Actualizar",
+      refreshAria: "Actualizar la página",
+      statusLoading: "Cargando…",
+      statusConnected: "Conectado",
+      statusErrorPrefix: "Error: ",
+      statusTokenMissing: "Configure el token en config.js (Perfil HA → Crear token)",
+      error401Hint: " Verifique el token en config.js (Perfil HA → Crear token) y que baseUrl apunte a Home Assistant.",
+      networkUnavailable: "Red no disponible",
+      labelCurrentTemperature: "Temperatura actual",
+      lastUpdatePrefix: "Última actualización: ",
+      modeHeating: "Calentando",
+      modeIdle: "Inactivo",
+      modeOff: "Apagado",
+      modeHeat: "Calefacción",
+      presetAway: "Ausente",
+      presetSleep: "Sueño",
+      presetEco: "Eco",
+      presetComfort: "Confort",
+      ariaDecrease: "Bajar",
+      ariaIncrease: "Subir",
+      comfortMessage: "Por favor, sean razonables con la calefacción."
+    }
+  };
 
   var el = {
     status: document.getElementById("status"),
     btnRefresh: document.getElementById("btnRefresh"),
+    btnLangFr: document.getElementById("btnLangFr"),
+    btnLangEn: document.getElementById("btnLangEn"),
+    btnLangEs: document.getElementById("btnLangEs"),
+    labelCurrentTemp: document.getElementById("labelCurrentTemp"),
     currentTemp: document.getElementById("currentTemp"),
     targetTemp: document.getElementById("targetTemp"),
     lastUpdate: document.getElementById("lastUpdate"),
@@ -33,11 +110,31 @@
     btnPresetSleep: document.getElementById("btnPresetSleep"),
     btnPresetEco: document.getElementById("btnPresetEco"),
     btnPresetComfort: document.getElementById("btnPresetComfort"),
+    labelPresetAway: document.getElementById("labelPresetAway"),
+    labelPresetSleep: document.getElementById("labelPresetSleep"),
+    labelPresetEco: document.getElementById("labelPresetEco"),
+    labelPresetComfort: document.getElementById("labelPresetComfort"),
     comfortMessage: document.getElementById("comfortMessage")
   };
 
   var currentState = null;
   var refreshTimer = null;
+  var currentLang = "en";
+  var lastStatusType = "loading";
+  var lastStatusErrorMessage = "";
+
+  function t(key) {
+    var langDict = I18N[currentLang] || I18N.en;
+    if (langDict[key] != null) return langDict[key];
+    if (I18N.en[key] != null) return I18N.en[key];
+    return key;
+  }
+
+  function localeForCurrentLang() {
+    if (currentLang === "fr") return "fr-FR";
+    if (currentLang === "es") return "es-ES";
+    return "en-US";
+  }
 
   function setStatus(text, className) {
     el.status.textContent = text;
@@ -45,18 +142,56 @@
     el.btnRefresh.style.display = (className === "connected") ? "none" : "";
   }
 
+  function setStatusLoading() {
+    lastStatusType = "loading";
+    lastStatusErrorMessage = "";
+    setStatus(t("statusLoading"), "");
+  }
+
+  function setStatusConnected() {
+    lastStatusType = "connected";
+    lastStatusErrorMessage = "";
+    setStatus(t("statusConnected"), "connected");
+  }
+
+  function setStatusTokenMissing() {
+    lastStatusType = "token_missing";
+    lastStatusErrorMessage = "";
+    setStatus(t("statusTokenMissing"), "error");
+  }
+
+  function setStatusErrorMessage(rawMessage) {
+    lastStatusType = "error";
+    lastStatusErrorMessage = rawMessage || "";
+    setStatus(t("statusErrorPrefix") + lastStatusErrorMessage, "error");
+  }
+
+  function rerenderStatusForLanguage() {
+    if (lastStatusType === "connected") {
+      setStatus(t("statusConnected"), "connected");
+    } else if (lastStatusType === "token_missing") {
+      setStatus(t("statusTokenMissing"), "error");
+    } else if (lastStatusType === "error") {
+      setStatus(t("statusErrorPrefix") + lastStatusErrorMessage, "error");
+    } else {
+      setStatus(t("statusLoading"), "");
+    }
+  }
+
   function formatTemp(value) {
     if (value == null || value === "") return "—";
     var n = parseFloat(value, 10);
     if (isNaN(n)) return "—";
-    return n.toFixed(1) + " °C";
+    var temp = n.toFixed(1);
+    if (currentLang !== "en") temp = temp.replace(".", ",");
+    return temp + " °C";
   }
 
   function formatTime(isoString) {
     if (!isoString) return "—";
     try {
       var d = new Date(isoString);
-      return d.toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      return d.toLocaleTimeString(localeForCurrentLang(), { hour: "2-digit", minute: "2-digit", second: "2-digit" });
     } catch (e) {
       return "—";
     }
@@ -107,14 +242,14 @@
       } else {
         var msg = "HTTP " + status + (response && response.message ? " — " + response.message : "");
         if (status === 401) {
-          msg += " Check the token in config.js (HA Profile → Create token) and that baseUrl points to Home Assistant.";
+          msg += t("error401Hint");
         }
         callback(new Error(msg), null);
       }
     };
 
     xhr.onerror = function () {
-      callback(new Error("Network unavailable"), null);
+      callback(new Error(t("networkUnavailable")), null);
     };
 
     if (body && (method === "POST" || method === "PUT")) {
@@ -144,15 +279,15 @@
 
     el.currentTemp.textContent = formatTemp(current);
     el.targetTemp.textContent = formatTemp(target);
-    el.lastUpdate.textContent = "Last update: " + formatTime(state.last_updated);
+    el.lastUpdate.textContent = t("lastUpdatePrefix") + formatTime(state.last_updated);
 
     var modeState = (state.state || "").toLowerCase();
     var hvacAction = (attrs.hvac_action || "").toLowerCase();
-    if (hvacAction === "heating") el.modeLabel.textContent = "Chauffe";
-    else if (hvacAction === "idle") el.modeLabel.textContent = "Inactif";
-    else if (hvacAction === "off") el.modeLabel.textContent = "Arrêt";
-    else if (modeState === "heat") el.modeLabel.textContent = "Chauffage";
-    else if (modeState === "off") el.modeLabel.textContent = "Arrêt";
+    if (hvacAction === "heating") el.modeLabel.textContent = t("modeHeating");
+    else if (hvacAction === "idle") el.modeLabel.textContent = t("modeIdle");
+    else if (hvacAction === "off") el.modeLabel.textContent = t("modeOff");
+    else if (modeState === "heat") el.modeLabel.textContent = t("modeHeat");
+    else if (modeState === "off") el.modeLabel.textContent = t("modeOff");
     else el.modeLabel.textContent = modeState || "—";
 
     var minT = attrs.min_temp != null ? parseFloat(attrs.min_temp, 10) : 5;
@@ -185,17 +320,74 @@
     el.btnDown.disabled = target != null && parseFloat(target, 10) <= minT;
   }
 
+  function loadSavedLanguage() {
+    var lang = "en";
+    try {
+      var saved = localStorage.getItem(LANG_STORAGE_KEY);
+      if (saved && I18N[saved]) lang = saved;
+    } catch (e) {}
+    return lang;
+  }
+
+  function saveLanguage(lang) {
+    try {
+      localStorage.setItem(LANG_STORAGE_KEY, lang);
+    } catch (e) {}
+  }
+
+  function updateLanguageButtons() {
+    [el.btnLangFr, el.btnLangEn, el.btnLangEs].forEach(function (btn) {
+      if (!btn) return;
+      btn.classList.remove("active");
+    });
+    if (currentLang === "fr" && el.btnLangFr) el.btnLangFr.classList.add("active");
+    else if (currentLang === "es" && el.btnLangEs) el.btnLangEs.classList.add("active");
+    else if (el.btnLangEn) el.btnLangEn.classList.add("active");
+  }
+
+  function applyTranslations() {
+    document.documentElement.lang = currentLang;
+    if (el.btnRefresh) {
+      el.btnRefresh.textContent = t("refresh");
+      el.btnRefresh.setAttribute("aria-label", t("refreshAria"));
+      el.btnRefresh.setAttribute("title", t("refresh"));
+    }
+    if (el.labelCurrentTemp) el.labelCurrentTemp.textContent = t("labelCurrentTemperature");
+    if (el.labelPresetAway) el.labelPresetAway.textContent = t("presetAway");
+    if (el.labelPresetSleep) el.labelPresetSleep.textContent = t("presetSleep");
+    if (el.labelPresetEco) el.labelPresetEco.textContent = t("presetEco");
+    if (el.labelPresetComfort) el.labelPresetComfort.textContent = t("presetComfort");
+    if (el.btnPresetAway) el.btnPresetAway.setAttribute("title", t("presetAway"));
+    if (el.btnPresetSleep) el.btnPresetSleep.setAttribute("title", t("presetSleep"));
+    if (el.btnPresetEco) el.btnPresetEco.setAttribute("title", t("presetEco"));
+    if (el.btnPresetComfort) el.btnPresetComfort.setAttribute("title", t("presetComfort"));
+    if (el.btnDown) el.btnDown.setAttribute("aria-label", t("ariaDecrease"));
+    if (el.btnUp) el.btnUp.setAttribute("aria-label", t("ariaIncrease"));
+    if (el.comfortMessage) el.comfortMessage.textContent = t("comfortMessage");
+
+    updateLanguageButtons();
+    rerenderStatusForLanguage();
+    if (currentState) updateUI(currentState);
+  }
+
+  function setLanguage(lang) {
+    if (!I18N[lang]) return;
+    currentLang = lang;
+    saveLanguage(lang);
+    applyTranslations();
+  }
+
   function refresh() {
     if (!token || token === "VOTRE_TOKEN_ICI") {
-      setStatus("Set the token in config.js (HA Profile → Create token)", "error");
+      setStatusTokenMissing();
       return;
     }
     loadState(function (err, state) {
       if (err) {
-        setStatus("Error: " + err.message, "error");
+        setStatusErrorMessage(err.message);
         return;
       }
-      setStatus("Connected", "connected");
+      setStatusConnected();
       updateUI(state);
     });
   }
@@ -207,21 +399,7 @@
     }, function (err) {
       if (done) done(err);
       if (err) {
-        setStatus("Error: " + err.message, "error");
-      } else {
-        refresh();
-      }
-    });
-  }
-
-  function setHVACMode(mode, done) {
-    apiRequest("POST", "/api/services/climate/set_hvac_mode", {
-      entity_id: entityId,
-      hvac_mode: mode
-    }, function (err) {
-      if (done) done(err);
-      if (err) {
-        setStatus("Error: " + err.message, "error");
+        setStatusErrorMessage(err.message);
       } else {
         refresh();
       }
@@ -234,7 +412,7 @@
       preset_mode: preset
     }, function (err) {
       if (err) {
-        setStatus("Error: " + err.message, "error");
+        setStatusErrorMessage(err.message);
       } else {
         refresh();
       }
@@ -243,22 +421,21 @@
 
   function onUp() {
     if (!currentState || !currentState.attributes) return;
-    var t = currentState.attributes.temperature;
-    if (t == null) t = 20;
-    var next = parseFloat(t, 10) + step;
+    var tValue = currentState.attributes.temperature;
+    if (tValue == null) tValue = 20;
+    var next = parseFloat(tValue, 10) + step;
     setTemperature(next);
   }
 
   function onDown() {
     if (!currentState || !currentState.attributes) return;
-    var t = currentState.attributes.temperature;
-    if (t == null) t = 20;
-    var next = parseFloat(t, 10) - step;
+    var tValue = currentState.attributes.temperature;
+    if (tValue == null) tValue = 20;
+    var next = parseFloat(tValue, 10) - step;
     setTemperature(next);
   }
 
   el.btnRefresh.addEventListener("click", function () { window.location.reload(); });
-
   el.btnUp.addEventListener("click", onUp);
   el.btnDown.addEventListener("click", onDown);
   el.btnPresetAway.addEventListener("click", function () { setPresetMode("away"); });
@@ -266,6 +443,13 @@
   el.btnPresetEco.addEventListener("click", function () { setPresetMode("eco"); });
   el.btnPresetSleep.addEventListener("click", function () { setPresetMode("sleep"); });
 
+  if (el.btnLangFr) el.btnLangFr.addEventListener("click", function () { setLanguage("fr"); });
+  if (el.btnLangEn) el.btnLangEn.addEventListener("click", function () { setLanguage("en"); });
+  if (el.btnLangEs) el.btnLangEs.addEventListener("click", function () { setLanguage("es"); });
+
+  currentLang = loadSavedLanguage();
+  applyTranslations();
+  setStatusLoading();
   refresh();
   refreshTimer = setInterval(refresh, refreshInterval);
 })();
