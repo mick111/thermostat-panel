@@ -25,9 +25,10 @@
     modeLabel: document.getElementById("modeLabel"),
     dialFill: document.getElementById("dialFill"),
     btnPresetAway: document.getElementById("btnPresetAway"),
-    btnPresetComfort: document.getElementById("btnPresetComfort"),
+    btnPresetSleep: document.getElementById("btnPresetSleep"),
     btnPresetEco: document.getElementById("btnPresetEco"),
-    btnPresetSleep: document.getElementById("btnPresetSleep")
+    btnPresetComfort: document.getElementById("btnPresetComfort"),
+    comfortMessage: document.getElementById("comfortMessage")
   };
 
   var currentState = null;
@@ -125,13 +126,15 @@
     el.dialFill.style.setProperty("--dial-angle", angle + "deg");
 
     var presetMode = (attrs.preset_mode || "").toLowerCase();
-    [el.btnPresetAway, el.btnPresetComfort, el.btnPresetEco, el.btnPresetSleep].forEach(function (btn) {
+    [el.btnPresetAway, el.btnPresetSleep, el.btnPresetEco, el.btnPresetComfort].forEach(function (btn) {
       btn.classList.remove("active");
     });
     if (presetMode === "away") el.btnPresetAway.classList.add("active");
-    else if (presetMode === "comfort") el.btnPresetComfort.classList.add("active");
-    else if (presetMode === "eco") el.btnPresetEco.classList.add("active");
     else if (presetMode === "sleep") el.btnPresetSleep.classList.add("active");
+    else if (presetMode === "eco") el.btnPresetEco.classList.add("active");
+    else if (presetMode === "comfort") el.btnPresetComfort.classList.add("active");
+
+    el.comfortMessage.style.display = presetMode === "comfort" ? "" : "none";
 
     el.btnUp.disabled = target != null && parseFloat(target, 10) >= maxT;
     el.btnDown.disabled = target != null && parseFloat(target, 10) <= minT;

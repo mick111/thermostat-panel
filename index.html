@@ -55,11 +55,13 @@
       </section>
 
       <section class="presets-row">
-        <button type="button" id="btnPresetAway" class="btn btn-preset">Away</button>
-        <button type="button" id="btnPresetComfort" class="btn btn-preset">Comfort</button>
-        <button type="button" id="btnPresetEco" class="btn btn-preset">Eco</button>
-        <button type="button" id="btnPresetSleep" class="btn btn-preset">Sleep</button>
+        <button type="button" id="btnPresetAway" class="btn btn-preset btn-preset-away" title="Away"><span class="preset-icon" aria-hidden="true">🏠</span><span>Away</span></button>
+        <button type="button" id="btnPresetSleep" class="btn btn-preset btn-preset-sleep" title="Sleep"><span class="preset-icon" aria-hidden="true">🌙</span><span>Sleep</span></button>
+        <button type="button" id="btnPresetEco" class="btn btn-preset btn-preset-eco" title="Eco"><span class="preset-icon" aria-hidden="true">🌿</span><span>Eco</span></button>
+        <button type="button" id="btnPresetComfort" class="btn btn-preset btn-preset-comfort" title="Comfort"><span class="preset-icon" aria-hidden="true">🔥</span><span>Comfort</span></button>
       </section>
+
+      <p id="comfortMessage" class="comfort-message" role="status" aria-live="polite" style="display: none;">Please be reasonable with heating.<br>Merci d’être raisonnable sur le chauffage.</p>
     </main>
 
     <footer class="footer">
