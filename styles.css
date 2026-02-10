@@ -123,7 +123,7 @@ html, body {
   color: var(--ha-text);
 }
 
-/* Dial section */
+/* Dial section — arc from bottom-left to bottom-right (semicircle) */
 .dial-section {
   display: flex;
   flex-direction: column;
@@ -135,18 +135,19 @@ html, body {
 .dial-wrap {
   position: relative;
   width: 100%;
-  padding-bottom: 100%;
+  padding-bottom: 50%;
   margin-bottom: 1rem;
+  overflow: hidden;
 }
 
 .dial-bg,
-.dial-fill,
-.dial-center {
+.dial-fill {
   position: absolute;
-  top: 0;
   left: 0;
+  bottom: 0;
   width: 100%;
-  height: 100%;
+  height: 0;
+  padding-bottom: 100%;
   border-radius: 50%;
 }
 
@@ -156,23 +157,23 @@ html, body {
 
 .dial-fill {
   --dial-angle: 0deg;
-  --dial-color: var(--ha-heat-soft);
-  --dial-bg: transparent;
   background: conic-gradient(
-    from -90deg,
-    var(--dial-color) 0deg,
-    var(--dial-color) var(--dial-angle),
+    from 270deg,
+    var(--ha-heat-soft) 0deg,
+    var(--ha-heat-soft) var(--dial-angle),
     var(--ha-divider) var(--dial-angle),
-    var(--ha-divider) 360deg
+    var(--ha-divider) 180deg
   );
 }
 
 .dial-center {
-  top: 50%;
+  position: absolute;
   left: 50%;
-  width: 76%;
-  height: 76%;
-  margin: -38% 0 0 -38%;
+  top: 25%;
+  width: 48%;
+  padding-bottom: 48%;
+  height: 0;
+  margin: -24% 0 0 -24%;
   background: var(--ha-surface);
   border-radius: 50%;
   box-shadow: 0 2px 8px var(--ha-shadow);
@@ -180,7 +181,26 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 0;
+  box-sizing: content-box;
+}
+
+.dial-center-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.dial-center .dial-mode,
+.dial-center .dial-target {
+  position: relative;
+  margin: 0;
+  text-align: center;
+  z-index: 1;
 }
 
 .dial-mode {

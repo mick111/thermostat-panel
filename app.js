@@ -122,7 +122,7 @@
     var minT = attrs.min_temp != null ? parseFloat(attrs.min_temp, 10) : 5;
     var maxT = attrs.max_temp != null ? parseFloat(attrs.max_temp, 10) : 35;
     var targetNum = target != null ? parseFloat(target, 10) : minT;
-    var angle = maxT > minT ? ((targetNum - minT) / (maxT - minT)) * 360 : 0;
+    var angle = maxT > minT ? ((targetNum - minT) / (maxT - minT)) * 180 : 0;
     el.dialFill.style.setProperty("--dial-angle", angle + "deg");
 
     var presetMode = (attrs.preset_mode || "").toLowerCase();
@@ -134,7 +134,7 @@
     else if (presetMode === "eco") el.btnPresetEco.classList.add("active");
     else if (presetMode === "comfort") el.btnPresetComfort.classList.add("active");
 
-    el.comfortMessage.style.display = presetMode === "comfort" ? "" : "none";
+    el.comfortMessage.style.display = targetNum > 22 ? "" : "none";
 
     el.btnUp.disabled = target != null && parseFloat(target, 10) >= maxT;
     el.btnDown.disabled = target != null && parseFloat(target, 10) <= minT;
