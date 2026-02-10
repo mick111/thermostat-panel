@@ -1,0 +1,179 @@
+/* Panneau thermostat — style kiosque, plein écran, tactile */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #1a1a2e;
+  color: #eee;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Header */
+.header {
+  padding: 1rem 1.5rem;
+  background: #16213e;
+  border-bottom: 2px solid #0f3460;
+}
+
+.header h1 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.status {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #a0a0a0;
+}
+
+.status.connected {
+  color: #4ecca3;
+}
+
+.status.error {
+  color: #e94560;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  overflow: auto;
+}
+
+.card {
+  background: #16213e;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #0f3460;
+}
+
+.card h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #a0a0a0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.big-value {
+  margin: 0;
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.temp-card .big-value,
+.target-card .big-value {
+  color: #4ecca3;
+}
+
+/* Ligne consigne +/− */
+.target-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.btn-round {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  border: 2px solid #0f3460;
+  background: #0f3460;
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn-round:active {
+  background: #4ecca3;
+  transform: scale(0.95);
+}
+
+.btn-round:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Boutons mode */
+.mode-value {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  color: #4ecca3;
+}
+
+.buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.btn-mode {
+  flex: 1;
+  min-width: 100px;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 2px solid #0f3460;
+  background: #0f3460;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.btn-mode:active {
+  transform: scale(0.98);
+}
+
+.btn-mode.active {
+  background: #4ecca3;
+  border-color: #4ecca3;
+  color: #1a1a2e;
+}
+
+/* Footer */
+.footer {
+  padding: 0.75rem 1.5rem;
+  background: #0f3460;
+  font-size: 0.8rem;
+  color: #708090;
+  text-align: center;
+}
+
+.footer p {
+  margin: 0;
+}
