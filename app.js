@@ -35,7 +35,7 @@
       modeOff: "Off",
       modeHeat: "Heat",
       presetAway: "Away",
-      presetSleep: "Comfort+",
+      presetActivity: "Comfort+",
       presetEco: "Eco",
       presetComfort: "Comfort",
       ariaDecrease: "Decrease",
@@ -58,7 +58,7 @@
       modeOff: "Arrêt",
       modeHeat: "Chauffage",
       presetAway: "Départ",
-      presetSleep: "Confort+",
+      presetActivity: "Confort+",
       presetEco: "Éco",
       presetComfort: "Confort",
       ariaDecrease: "Baisser",
@@ -81,7 +81,7 @@
       modeOff: "Apagado",
       modeHeat: "Calefacción",
       presetAway: "Salida",
-      presetSleep: "Confort+",
+      presetActivity: "Confort+",
       presetEco: "Eco",
       presetComfort: "Confort",
       ariaDecrease: "Bajar",
@@ -104,7 +104,7 @@
       modeOff: "关闭",
       modeHeat: "加热",
       presetAway: "外出",
-      presetSleep: "舒适+",
+      presetActivity: "舒适+",
       presetEco: "节能",
       presetComfort: "舒适",
       ariaDecrease: "降低",
@@ -131,11 +131,11 @@
     dialFillPath: document.getElementById("dialFillPath"),
     dialCurrentDot: document.getElementById("dialCurrentDot"),
     btnPresetAway: document.getElementById("btnPresetAway"),
-    btnPresetSleep: document.getElementById("btnPresetSleep"),
+    btnPresetActivity: document.getElementById("btnPresetActivity"),
     btnPresetEco: document.getElementById("btnPresetEco"),
     btnPresetComfort: document.getElementById("btnPresetComfort"),
     labelPresetAway: document.getElementById("labelPresetAway"),
-    labelPresetSleep: document.getElementById("labelPresetSleep"),
+    labelPresetActivity: document.getElementById("labelPresetActivity"),
     labelPresetEco: document.getElementById("labelPresetEco"),
     labelPresetComfort: document.getElementById("labelPresetComfort"),
     comfortMessage: document.getElementById("comfortMessage")
@@ -331,11 +331,11 @@
     el.dialCurrentDot.setAttribute("cy", currentPoint.y);
 
     var presetMode = (attrs.preset_mode || "").toLowerCase();
-    [el.btnPresetAway, el.btnPresetSleep, el.btnPresetEco, el.btnPresetComfort].forEach(function (btn) {
+    [el.btnPresetAway, el.btnPresetActivity, el.btnPresetEco, el.btnPresetComfort].forEach(function (btn) {
       btn.classList.remove("active");
     });
     if (presetMode === "away") el.btnPresetAway.classList.add("active");
-    else if (presetMode === "sleep") el.btnPresetSleep.classList.add("active");
+    else if (presetMode === "activity") el.btnPresetActivity.classList.add("active");
     else if (presetMode === "eco") el.btnPresetEco.classList.add("active");
     else if (presetMode === "comfort") el.btnPresetComfort.classList.add("active");
 
@@ -380,11 +380,11 @@
     }
     if (el.labelCurrentTemp) el.labelCurrentTemp.textContent = t("labelCurrentTemperature");
     if (el.labelPresetAway) el.labelPresetAway.textContent = t("presetAway");
-    if (el.labelPresetSleep) el.labelPresetSleep.textContent = t("presetSleep");
+    if (el.labelPresetActivity) el.labelPresetActivity.textContent = t("presetActivity");
     if (el.labelPresetEco) el.labelPresetEco.textContent = t("presetEco");
     if (el.labelPresetComfort) el.labelPresetComfort.textContent = t("presetComfort");
     if (el.btnPresetAway) el.btnPresetAway.setAttribute("title", t("presetAway"));
-    if (el.btnPresetSleep) el.btnPresetSleep.setAttribute("title", t("presetSleep"));
+    if (el.btnPresetActivity) el.btnPresetActivity.setAttribute("title", t("presetActivity"));
     if (el.btnPresetEco) el.btnPresetEco.setAttribute("title", t("presetEco"));
     if (el.btnPresetComfort) el.btnPresetComfort.setAttribute("title", t("presetComfort"));
     if (el.btnDown) el.btnDown.setAttribute("aria-label", t("ariaDecrease"));
@@ -467,7 +467,7 @@
   el.btnPresetAway.addEventListener("click", function () { setPresetMode("away"); });
   el.btnPresetComfort.addEventListener("click", function () { setPresetMode("comfort"); });
   el.btnPresetEco.addEventListener("click", function () { setPresetMode("eco"); });
-  el.btnPresetSleep.addEventListener("click", function () { setPresetMode("sleep"); });
+  el.btnPresetActivity.addEventListener("click", function () { setPresetMode("activity"); });
 
   // Kiosk fallback for older iOS: block elastic vertical scroll.
   document.addEventListener("touchmove", function (evt) {

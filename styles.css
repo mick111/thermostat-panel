@@ -428,10 +428,10 @@ body {
   color: #4a148c;
 }
 
-.btn-preset-sleep.active {
-  background: #bbdefb;
-  border-color: #1976d2;
-  color: #0d47a1;
+.btn-preset-activity.active {
+  background: #ffcdd2;
+  border-color: #c62828;
+  color: #b71c1c;
 }
 
 .btn-preset-eco.active {
@@ -441,9 +441,9 @@ body {
 }
 
 .btn-preset-comfort.active {
-  background: #ffcdd2;
-  border-color: #c62828;
-  color: #b71c1c;
+  background: #bbdefb;
+  border-color: #1976d2;
+  color: #0d47a1;
 }
 
 /* Guest message shown when target temperature is high */
