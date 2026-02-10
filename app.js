@@ -16,6 +16,18 @@
   var ARC_START_DEG = 225;
   var ARC_SPAN_DEG = 270;
   var ARC_RADIUS = 43;
+  var PRESET_TEMPERATURES = {
+    away: 17,
+    eco: 19,
+    comfort: 20,
+    activity: 21
+  };
+  var RING_COLORS = {
+    away: "#7b1fa2",
+    eco: "#388e3c",
+    comfort: "#1976d2",
+    activity: "#c62828"
+  };
   var LANG_STORAGE_KEY = "thermostat-panel-lang";
 
   var I18N = {
@@ -247,6 +259,13 @@
       " A " + radius + " " + radius + " 0 " + largeArcFlag + " 1 " + end.x + " " + end.y;
   }
 
+  function modeFromTargetTemperature(targetNum) {
+    if (targetNum >= PRESET_TEMPERATURES.activity) return "activity";
+    if (targetNum >= PRESET_TEMPERATURES.comfort) return "comfort";
+    if (targetNum >= PRESET_TEMPERATURES.eco) return "eco";
+    return "away";
+  }
+
   function apiRequest(method, path, body, callback) {
     var url = baseUrl + path;
     var xhr = new XMLHttpRequest();
@@ -322,6 +341,8 @@
     var targetDelta = targetRatio * ARC_SPAN_DEG;
     el.dialTrackPath.setAttribute("d", describeArc(ARC_START_DEG, ARC_SPAN_DEG, ARC_RADIUS));
     el.dialFillPath.setAttribute("d", describeArc(ARC_START_DEG, targetDelta, ARC_RADIUS));
+    var ringMode = modeFromTargetTemperature(targetNum);
+    el.dialFillPath.setAttribute("stroke", RING_COLORS[ringMode] || RING_COLORS.comfort);
 
     var currentNum = current != null ? parseFloat(current, 10) : minT;
     var currentRatio = maxT > minT ? clamp01((currentNum - minT) / (maxT - minT)) : 0;
@@ -339,7 +360,7 @@
     else if (presetMode === "eco") el.btnPresetEco.classList.add("active");
     else if (presetMode === "comfort") el.btnPresetComfort.classList.add("active");
 
-    el.comfortMessage.style.display = targetNum > 22 ? "" : "none";
+    el.comfortMessage.style.display = targetNum > PRESET_TEMPERATURES.activity ? "" : "none";
 
     el.btnUp.disabled = target != null && parseFloat(target, 10) >= maxT;
     el.btnDown.disabled = target != null && parseFloat(target, 10) <= minT;
