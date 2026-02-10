@@ -35,7 +35,6 @@
   function setStatus(text, className) {
     el.status.textContent = text;
     el.status.className = "status " + (className || "");
-    el.btnRefresh.style.display = (className === "error") ? "" : "none";
   }
 
   function formatTemp(value) {
@@ -190,7 +189,6 @@
     setTemperature(next);
   }
 
-  el.btnRefresh.style.display = "none";
   el.btnRefresh.addEventListener("click", function () { window.location.reload(); });
 
   el.btnUp.addEventListener("click", onUp);
