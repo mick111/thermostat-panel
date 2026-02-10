@@ -24,6 +24,7 @@ body {
   height: 100%;
   width: 100%;
   overflow: hidden;
+  overscroll-behavior-y: none;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
@@ -37,7 +38,9 @@ body {
 #app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
@@ -133,7 +136,7 @@ body {
   align-items: center;
   gap: 0.5rem;
   padding: 1rem;
-  overflow: auto;
+  overflow: hidden;
 }
 
 /* Current temp (top) */
@@ -345,54 +348,23 @@ body {
   transition: background 0.15s, transform 0.1s;
 }
 
-.btn-icon {
+/* Reliable centering on old iOS: SVG glyph pinned to center */
+.btn-glyph {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 18px;
-  height: 18px;
-  margin-left: -9px;
-  margin-top: -9px;
-  color: #606060;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  margin-top: -10px;
+  overflow: visible;
 }
 
-.btn-icon::before,
-.btn-icon::after {
-  content: "";
-  position: absolute;
-  background: currentColor;
-  border-radius: 2px;
-}
-
-.btn-icon-minus::before {
-  left: 50%;
-  top: 50%;
-  width: 16px;
-  height: 2px;
-  margin-left: -8px;
-  margin-top: -1px;
-}
-
-.btn-icon-minus::after {
-  display: none;
-}
-
-.btn-icon-plus::before {
-  left: 50%;
-  top: 50%;
-  width: 16px;
-  height: 2px;
-  margin-left: -8px;
-  margin-top: -1px;
-}
-
-.btn-icon-plus::after {
-  left: 50%;
-  top: 50%;
-  width: 2px;
-  height: 16px;
-  margin-left: -1px;
-  margin-top: -8px;
+.btn-glyph line {
+  stroke: #606060;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .btn-round:active {

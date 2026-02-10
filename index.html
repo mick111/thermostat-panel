@@ -13,8 +13,8 @@
   <meta name="mobile-web-app-capable" content="yes">
   <title>Thermostat</title>
   <!-- Bump app-version and ?v= in links/scripts after each deploy -->
-  <meta name="app-version" content="6">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <meta name="app-version" content="8">
+  <link rel="stylesheet" href="styles.css?v=8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -61,8 +61,17 @@
           </div>
         </div>
         <div class="target-row">
-          <button type="button" id="btnDown" class="btn btn-round" aria-label="Decrease"><span class="btn-icon btn-icon-minus" aria-hidden="true"></span></button>
-          <button type="button" id="btnUp" class="btn btn-round" aria-label="Increase"><span class="btn-icon btn-icon-plus" aria-hidden="true"></span></button>
+          <button type="button" id="btnDown" class="btn btn-round" aria-label="Decrease">
+            <svg class="btn-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+          <button type="button" id="btnUp" class="btn btn-round" aria-label="Increase">
+            <svg class="btn-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+            </svg>
+          </button>
         </div>
       </section>
 
@@ -81,8 +90,8 @@
     </footer>
   </div>
 
-  <script src="config.js?v=6"></script>
-  <script src="app.js?v=6"></script>
+  <script src="config.js?v=8"></script>
+  <script src="app.js?v=8"></script>
 </body>
 
 </html>

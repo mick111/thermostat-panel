@@ -443,6 +443,11 @@
   el.btnPresetEco.addEventListener("click", function () { setPresetMode("eco"); });
   el.btnPresetSleep.addEventListener("click", function () { setPresetMode("sleep"); });
 
+  // Kiosk fallback for older iOS: block elastic vertical scroll.
+  document.addEventListener("touchmove", function (evt) {
+    evt.preventDefault();
+  }, { passive: false });
+
   if (el.btnLangFr) el.btnLangFr.addEventListener("click", function () { setLanguage("fr"); });
   if (el.btnLangEn) el.btnLangEn.addEventListener("click", function () { setLanguage("en"); });
   if (el.btnLangEs) el.btnLangEs.addEventListener("click", function () { setLanguage("es"); });
