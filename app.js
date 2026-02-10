@@ -16,6 +16,7 @@
 
   var el = {
     status: document.getElementById("status"),
+    btnRefresh: document.getElementById("btnRefresh"),
     currentTemp: document.getElementById("currentTemp"),
     targetTemp: document.getElementById("targetTemp"),
     lastUpdate: document.getElementById("lastUpdate"),
@@ -34,6 +35,7 @@
   function setStatus(text, className) {
     el.status.textContent = text;
     el.status.className = "status " + (className || "");
+    el.btnRefresh.style.display = (className === "error") ? "" : "none";
   }
 
   function formatTemp(value) {
@@ -187,6 +189,9 @@
     var next = parseFloat(t, 10) - step;
     setTemperature(next);
   }
+
+  el.btnRefresh.style.display = "none";
+  el.btnRefresh.addEventListener("click", function () { window.location.reload(); });
 
   el.btnUp.addEventListener("click", onUp);
   el.btnDown.addEventListener("click", onDown);

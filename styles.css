@@ -54,6 +54,35 @@ html, body {
   color: #e94560;
 }
 
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.status-row .status {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-refresh {
+  flex-shrink: 0;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  background: #0f3460;
+  color: #eee;
+  border: 1px solid #e94560;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-refresh:hover,
+.btn-refresh:active {
+  background: #e94560;
+  color: #fff;
+}
+
 /* Main */
 .main {
   flex: 1;

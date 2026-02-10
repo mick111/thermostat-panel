@@ -7,7 +7,7 @@ Application web minimaliste pour piloter un thermostat Home Assistant depuis un 
 - **index.html** — Page principale (température, consigne, mode, boutons)
 - **styles.css** — Mise en page plein écran, tactile
 - **app.js** — Appels API Home Assistant (lecture état, set_temperature, set_hvac_mode)
-- **config.js** — À éditer : URL HA, token, entity_id du thermostat
+- **config.js** — À éditer : URL HA, token, entity_id du thermostat (le token est visible côté client, voir **SECURITE.md**)
 - **VERROUILLAGE.md** — Comment verrouiller l’iPad (Accès guidé + réglages)
 
 ## Configuration

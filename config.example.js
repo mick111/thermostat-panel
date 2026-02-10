@@ -8,7 +8,8 @@ var CONFIG = {
   // Pour forcer l'URL HA : "https://echiquier.duckdns.org:48123"
   baseUrl: "auto",
 
-  // Long-Lived Access Token (Profil HA > Créer un jeton)
+  // Long-Lived Access Token (Profil HA > Créer un jeton).
+  // Attention : ce token est visible par quiconque peut charger la page. Voir SECURITE.md.
   token: "VOTRE_TOKEN_ICI",
 
   // Entity ID du thermostat (ex: climate.salon, climate.thermostat)
