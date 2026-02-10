@@ -23,10 +23,10 @@
     activity: 21
   };
   var RING_COLORS = {
-    away: "#7b1fa2",
-    eco: "#388e3c",
-    comfort: "#1976d2",
-    activity: "#ef6c00",
+    away: "#e1bee7",
+    eco: "#c8e6c9",
+    comfort: "#bbdefb",
+    activity: "#ffe0b2",
     over: "#c62828"
   };
   var LANG_STORAGE_KEY = "thermostat-panel-lang";
