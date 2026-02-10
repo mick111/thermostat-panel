@@ -493,14 +493,29 @@ body {
   margin: 0.75rem 0 0;
   padding: 0.5rem 1rem;
   max-width: 320px;
-  text-align: center;
-  white-space: pre-line;
-  line-height: 1.45;
+  display: grid;
+  grid-template-columns: 1.4rem 1fr 1.4rem;
+  align-items: center;
+  column-gap: 0.35rem;
+  row-gap: 0.2rem;
   font-size: 0.875rem;
   color: #b71c1c;
   background: #ffebee;
   border: 1px solid #ffcdd2;
   border-radius: 8px;
+}
+
+.comfort-text {
+  text-align: center;
+  line-height: 1.45;
+}
+
+.comfort-icon {
+  width: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 /* Footer */

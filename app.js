@@ -63,7 +63,8 @@
       ariaIncrease: "Increase",
       unitToggleAria: "Toggle temperature unit",
       unitToggleTitle: "Switch between Celsius and Fahrenheit",
-      comfortMessage: "⚠️ Significant environmental impact ⚠️\n🌍 Let's think about our planet 🌍"
+      comfortMessageLine1: "Significant environmental impact",
+      comfortMessageLine2: "Let's think about our planet"
     },
     fr: {
       refresh: "Rafraîchir",
@@ -88,7 +89,8 @@
       ariaIncrease: "Monter",
       unitToggleAria: "Basculer l'unité de température",
       unitToggleTitle: "Basculer entre Celsius et Fahrenheit",
-      comfortMessage: "⚠️ Impact environnemental important ⚠️\n🌍 Pensons à notre planète 🌍"
+      comfortMessageLine1: "Impact environnemental important",
+      comfortMessageLine2: "Pensons à notre planète"
     },
     es: {
       refresh: "Actualizar",
@@ -113,7 +115,8 @@
       ariaIncrease: "Subir",
       unitToggleAria: "Cambiar unidad de temperatura",
       unitToggleTitle: "Alternar entre Celsius y Fahrenheit",
-      comfortMessage: "⚠️ Impacto ambiental importante ⚠️\n🌍 Pensemos en nuestro planeta 🌍"
+      comfortMessageLine1: "Impacto ambiental importante",
+      comfortMessageLine2: "Pensemos en nuestro planeta"
     },
     zh: {
       refresh: "刷新",
@@ -138,7 +141,8 @@
       ariaIncrease: "升高",
       unitToggleAria: "切换温度单位",
       unitToggleTitle: "在摄氏度和华氏度之间切换",
-      comfortMessage: "⚠️ 环境影响重大 ⚠️\n🌍 让我们一起关心我们的地球 🌍"
+      comfortMessageLine1: "环境影响重大",
+      comfortMessageLine2: "让我们一起关心我们的地球"
     }
   };
 
@@ -169,7 +173,9 @@
     labelPresetActivity: document.getElementById("labelPresetActivity"),
     labelPresetEco: document.getElementById("labelPresetEco"),
     labelPresetComfort: document.getElementById("labelPresetComfort"),
-    comfortMessage: document.getElementById("comfortMessage")
+    comfortMessage: document.getElementById("comfortMessage"),
+    comfortMessageLine1: document.getElementById("comfortMessageLine1"),
+    comfortMessageLine2: document.getElementById("comfortMessageLine2")
   };
 
   var currentState = null;
@@ -531,7 +537,8 @@
       el.btnUnitToggle.setAttribute("aria-label", t("unitToggleAria"));
       el.btnUnitToggle.setAttribute("title", t("unitToggleTitle"));
     }
-    if (el.comfortMessage) el.comfortMessage.textContent = t("comfortMessage");
+    if (el.comfortMessageLine1) el.comfortMessageLine1.textContent = t("comfortMessageLine1");
+    if (el.comfortMessageLine2) el.comfortMessageLine2.textContent = t("comfortMessageLine2");
 
     updateUnitToggleButton();
     updateLanguageButtons();

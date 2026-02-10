@@ -16,8 +16,8 @@
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=1">
   <link rel="icon" type="image/png" href="apple-touch-icon.png?v=1">
   <!-- Bump app-version and ?v= in links/scripts after each deploy -->
-  <meta name="app-version" content="27">
-  <link rel="stylesheet" href="styles.css?v=27">
+  <meta name="app-version" content="28">
+  <link rel="stylesheet" href="styles.css?v=28">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -95,8 +95,14 @@
             class="preset-icon" aria-hidden="true">🔥</span><span id="labelPresetActivity">Comfort+</span></button>
       </section>
 
-      <p id="comfortMessage" class="comfort-message" role="status" aria-live="polite" style="display: none;">⚠️
-        Significant environmental impact ⚠️<br>🌍 Let's think about our planet 🌍</p>
+      <div id="comfortMessage" class="comfort-message" role="status" aria-live="polite" style="display: none;">
+        <span class="comfort-icon comfort-icon-left" aria-hidden="true">⚠️</span>
+        <span id="comfortMessageLine1" class="comfort-text">Significant environmental impact</span>
+        <span class="comfort-icon comfort-icon-right" aria-hidden="true">⚠️</span>
+        <span class="comfort-icon comfort-icon-left" aria-hidden="true">🌍</span>
+        <span id="comfortMessageLine2" class="comfort-text">Let's think about our planet</span>
+        <span class="comfort-icon comfort-icon-right" aria-hidden="true">🌍</span>
+      </div>
     </main>
 
     <footer class="footer">
@@ -104,8 +110,8 @@
     </footer>
   </div>
 
-  <script src="config.js?v=27"></script>
-  <script src="app.js?v=27"></script>
+  <script src="config.js?v=28"></script>
+  <script src="app.js?v=28"></script>
 </body>
 
 </html>
