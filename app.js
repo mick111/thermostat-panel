@@ -9,7 +9,7 @@
   var baseUrl = (CONFIG.baseUrl === "auto" || !CONFIG.baseUrl)
     ? (window.location.origin || "").replace(/\/$/, "")
     : CONFIG.baseUrl.replace(/\/$/, "");
-  var token = CONFIG.token;
+  var token = (typeof CONFIG.token === "string" ? CONFIG.token : "").trim();
   var entityId = CONFIG.thermostatEntityId;
   var step = CONFIG.stepDegrees;
   var refreshInterval = CONFIG.refreshInterval;
@@ -71,7 +71,11 @@
       if (status >= 200 && status < 300) {
         callback(null, response);
       } else {
-        callback(new Error("HTTP " + status + (response && response.message ? " — " + response.message : "")), null);
+        var msg = "HTTP " + status + (response && response.message ? " — " + response.message : "");
+        if (status === 401) {
+          msg += ". Vérifiez le token dans config.js (Profil HA → Créer un jeton) et que baseUrl pointe bien vers Home Assistant.";
+        }
+        callback(new Error(msg), null);
       }
     };
 
@@ -126,6 +130,10 @@
   }
 
   function refresh() {
+    if (!token || token === "VOTRE_TOKEN_ICI") {
+      setStatus("Configurez le token dans config.js (Profil HA → Créer un jeton)", "error");
+      return;
+    }
     loadState(function (err, state) {
       if (err) {
         setStatus("Erreur : " + err.message, "error");

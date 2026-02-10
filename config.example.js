@@ -4,9 +4,8 @@
  */
 
 var CONFIG = {
-  // URL de base pour l'API. Mettez "auto" pour utiliser la même origine que la page
-  // (recommandé : fonctionne en VPN, en local, ou via Duck DNS sans rien changer).
-  // Sinon indiquez l'URL complète, ex: "https://echiquier.duckdns.org:48123"
+  // URL de base pour l'API. "auto" = même origine que la page (votre cas avec /local/thermostat-panel/).
+  // Pour forcer l'URL HA : "https://echiquier.duckdns.org:48123"
   baseUrl: "auto",
 
   // Long-Lived Access Token (Profil HA > Créer un jeton)
