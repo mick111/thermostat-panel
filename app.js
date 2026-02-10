@@ -388,8 +388,9 @@
     var targetNum = target != null ? parseFloat(target, 10) : minT;
     var targetRatio = maxT > minT ? clamp01((targetNum - minT) / (maxT - minT)) : 0;
     var targetDelta = targetRatio * ARC_SPAN_DEG;
+    var visibleTargetDelta = targetRatio <= 0 ? 0.75 : targetDelta;
     el.dialTrackPath.setAttribute("d", describeArc(ARC_START_DEG, ARC_SPAN_DEG, ARC_RADIUS));
-    el.dialFillPath.setAttribute("d", describeArc(ARC_START_DEG, targetDelta, ARC_RADIUS));
+    el.dialFillPath.setAttribute("d", describeArc(ARC_START_DEG, visibleTargetDelta, ARC_RADIUS));
     var targetNumC = convertTemperature(targetNum, tempUnit, "C");
     var ringMode = modeFromTargetTemperature(targetNumC);
     el.dialFillPath.setAttribute("stroke", RING_COLORS[ringMode] || RING_COLORS.comfort);
