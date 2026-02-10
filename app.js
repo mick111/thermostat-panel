@@ -414,12 +414,21 @@
     var currentRatio = maxT > minT ? clamp01((currentNum - minT) / (maxT - minT)) : 0;
     var targetDelta = targetRatio * ARC_SPAN_DEG;
     var currentDelta = currentRatio * ARC_SPAN_DEG;
+    var isTargetAboveCurrent = targetNum > currentNum;
+    var visibleTargetDelta = targetRatio <= 0 ? 0.75 : targetDelta;
     var visibleCurrentDelta = currentRatio <= 0 ? 0.75 : currentDelta;
     var currentDeg = ARC_START_DEG + currentDelta;
     var targetDeg = ARC_START_DEG + targetDelta;
     el.dialTrackPath.setAttribute("d", describeArc(ARC_START_DEG, ARC_SPAN_DEG, ARC_RADIUS));
-    el.dialFillSoftPath.setAttribute("d", describeArc(ARC_START_DEG, visibleCurrentDelta, ARC_RADIUS));
-    el.dialFillStrongPath.setAttribute("d", describeArcBetween(currentDeg, targetDeg, ARC_RADIUS));
+    if (isTargetAboveCurrent) {
+      el.dialFillSoftPath.setAttribute("d", describeArc(ARC_START_DEG, visibleCurrentDelta, ARC_RADIUS));
+      el.dialFillStrongPath.setAttribute("d", describeArcBetween(currentDeg, targetDeg, ARC_RADIUS));
+      el.dialFillStrongPath.removeAttribute("display");
+    } else {
+      el.dialFillSoftPath.setAttribute("d", describeArc(ARC_START_DEG, visibleTargetDelta, ARC_RADIUS));
+      el.dialFillStrongPath.setAttribute("d", "M 50 50");
+      el.dialFillStrongPath.setAttribute("display", "none");
+    }
     var targetNumC = convertTemperature(targetNum, tempUnit, "C");
     var ringMode = modeFromTargetTemperature(targetNumC);
     el.dialFillSoftPath.setAttribute("stroke", RING_COLORS_SOFT[ringMode] || RING_COLORS_SOFT.comfort);
