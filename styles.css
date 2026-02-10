@@ -329,8 +329,8 @@ body {
 }
 
 .btn-round {
-  width: 3rem;
-  height: 3rem;
+  width: 4rem;
+  aspect-ratio: 1;
   position: relative;
   display: block;
   padding: 0;

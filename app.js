@@ -184,7 +184,7 @@
     if (isNaN(n)) return "—";
     var temp = n.toFixed(1);
     if (currentLang !== "en") temp = temp.replace(".", ",");
-    return temp + " °C";
+    return temp + "°C";
   }
 
   function formatTime(isoString) {
@@ -235,7 +235,7 @@
       var response = null;
       try {
         if (xhr.responseText) response = JSON.parse(xhr.responseText);
-      } catch (e) {}
+      } catch (e) { }
 
       if (status >= 200 && status < 300) {
         callback(null, response);
@@ -325,14 +325,14 @@
     try {
       var saved = localStorage.getItem(LANG_STORAGE_KEY);
       if (saved && I18N[saved]) lang = saved;
-    } catch (e) {}
+    } catch (e) { }
     return lang;
   }
 
   function saveLanguage(lang) {
     try {
       localStorage.setItem(LANG_STORAGE_KEY, lang);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   function updateLanguageButtons() {
