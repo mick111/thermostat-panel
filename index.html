@@ -16,8 +16,8 @@
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=1">
   <link rel="icon" type="image/png" href="apple-touch-icon.png?v=1">
   <!-- Bump app-version and ?v= in links/scripts after each deploy -->
-  <meta name="app-version" content="9">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <meta name="app-version" content="11">
+  <link rel="stylesheet" href="styles.css?v=11">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -40,6 +40,7 @@
             <button type="button" id="btnLangFr" class="btn btn-lang" data-lang="fr">FR</button>
             <button type="button" id="btnLangEn" class="btn btn-lang" data-lang="en">EN</button>
             <button type="button" id="btnLangEs" class="btn btn-lang" data-lang="es">ES</button>
+            <button type="button" id="btnLangZh" class="btn btn-lang" data-lang="zh">中文</button>
           </div>
         </div>
       </div>
@@ -82,17 +83,17 @@
 
       <section class="presets-row">
         <button type="button" id="btnPresetAway" class="btn btn-preset btn-preset-away" title="Away"><span
-            class="preset-icon" aria-hidden="true">🏠</span><span id="labelPresetAway">Away</span></button>
-        <button type="button" id="btnPresetSleep" class="btn btn-preset btn-preset-sleep" title="Sleep"><span
-            class="preset-icon" aria-hidden="true">🌙</span><span id="labelPresetSleep">Sleep</span></button>
+            class="preset-icon" aria-hidden="true">🚪</span><span id="labelPresetAway">Away</span></button>
         <button type="button" id="btnPresetEco" class="btn btn-preset btn-preset-eco" title="Eco"><span
-            class="preset-icon" aria-hidden="true">🌿</span><span id="labelPresetEco">Eco</span></button>
+            class="preset-icon" aria-hidden="true">🍃</span><span id="labelPresetEco">Eco</span></button>
         <button type="button" id="btnPresetComfort" class="btn btn-preset btn-preset-comfort" title="Comfort"><span
-            class="preset-icon" aria-hidden="true">🔥</span><span id="labelPresetComfort">Comfort</span></button>
+            class="preset-icon" aria-hidden="true">🛋️</span><span id="labelPresetComfort">Comfort</span></button>
+        <button type="button" id="btnPresetSleep" class="btn btn-preset btn-preset-sleep" title="Comfort+"><span
+            class="preset-icon" aria-hidden="true">🔥</span><span id="labelPresetSleep">Comfort+</span></button>
       </section>
 
-      <p id="comfortMessage" class="comfort-message" role="status" aria-live="polite" style="display: none;">Please be
-        reasonable with heating.<br>Merci d’être raisonnable sur le chauffage.</p>
+      <p id="comfortMessage" class="comfort-message" role="status" aria-live="polite" style="display: none;">⚠️
+        Significant environmental impact<br>Let's think about our planet 🌍</p>
     </main>
 
     <footer class="footer">
@@ -100,8 +101,8 @@
     </footer>
   </div>
 
-  <script src="config.js?v=9"></script>
-  <script src="app.js?v=9"></script>
+  <script src="config.js?v=11"></script>
+  <script src="app.js?v=11"></script>
 </body>
 
 </html>

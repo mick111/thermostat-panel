@@ -377,7 +377,7 @@ body {
   cursor: not-allowed;
 }
 
-/* Preset buttons: Away, Sleep, Eco, Comfort (order) */
+/* Preset buttons: Away, Eco, Comfort, Comfort+ (order) */
 .presets-row {
   display: flex;
   flex-wrap: wrap;
@@ -446,12 +446,13 @@ body {
   color: #b71c1c;
 }
 
-/* Guest message when Comfort is selected */
+/* Guest message shown when target temperature is high */
 .comfort-message {
   margin: 0.75rem 0 0;
   padding: 0.5rem 1rem;
   max-width: 320px;
   text-align: center;
+  white-space: pre-line;
   font-size: 0.875rem;
   color: #b71c1c;
   background: #ffebee;

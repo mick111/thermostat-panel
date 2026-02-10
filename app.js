@@ -35,12 +35,12 @@
       modeOff: "Off",
       modeHeat: "Heat",
       presetAway: "Away",
-      presetSleep: "Sleep",
+      presetSleep: "Comfort+",
       presetEco: "Eco",
       presetComfort: "Comfort",
       ariaDecrease: "Decrease",
       ariaIncrease: "Increase",
-      comfortMessage: "Please be reasonable with heating."
+      comfortMessage: "⚠️ Significant environmental impact\nLet's think about our planet 🌍"
     },
     fr: {
       refresh: "Rafraîchir",
@@ -57,13 +57,13 @@
       modeIdle: "Inactif",
       modeOff: "Arrêt",
       modeHeat: "Chauffage",
-      presetAway: "Absent",
-      presetSleep: "Sommeil",
+      presetAway: "Départ",
+      presetSleep: "Confort+",
       presetEco: "Éco",
       presetComfort: "Confort",
       ariaDecrease: "Baisser",
       ariaIncrease: "Monter",
-      comfortMessage: "Merci d’être raisonnable sur le chauffage."
+      comfortMessage: "⚠️ Impact environnemental important\nPensons à notre planète 🌍"
     },
     es: {
       refresh: "Actualizar",
@@ -80,13 +80,36 @@
       modeIdle: "Inactivo",
       modeOff: "Apagado",
       modeHeat: "Calefacción",
-      presetAway: "Ausente",
-      presetSleep: "Sueño",
+      presetAway: "Salida",
+      presetSleep: "Confort+",
       presetEco: "Eco",
       presetComfort: "Confort",
       ariaDecrease: "Bajar",
       ariaIncrease: "Subir",
-      comfortMessage: "Por favor, sean razonables con la calefacción."
+      comfortMessage: "⚠️ Impacto ambiental importante\nPensemos en nuestro planeta 🌍"
+    },
+    zh: {
+      refresh: "刷新",
+      refreshAria: "刷新页面",
+      statusLoading: "加载中…",
+      statusConnected: "已连接",
+      statusErrorPrefix: "错误：",
+      statusTokenMissing: "请在 config.js 中设置令牌（HA 个人资料 → 创建令牌）",
+      error401Hint: " 请检查 config.js 中的令牌（HA 个人资料 → 创建令牌），并确认 baseUrl 指向 Home Assistant。",
+      networkUnavailable: "网络不可用",
+      labelCurrentTemperature: "当前温度",
+      lastUpdatePrefix: "最后更新：",
+      modeHeating: "加热中",
+      modeIdle: "待机",
+      modeOff: "关闭",
+      modeHeat: "加热",
+      presetAway: "外出",
+      presetSleep: "舒适+",
+      presetEco: "节能",
+      presetComfort: "舒适",
+      ariaDecrease: "降低",
+      ariaIncrease: "升高",
+      comfortMessage: "⚠️ 环境影响重大\n让我们一起关心我们的地球 🌍"
     }
   };
 
@@ -96,6 +119,7 @@
     btnLangFr: document.getElementById("btnLangFr"),
     btnLangEn: document.getElementById("btnLangEn"),
     btnLangEs: document.getElementById("btnLangEs"),
+    btnLangZh: document.getElementById("btnLangZh"),
     labelCurrentTemp: document.getElementById("labelCurrentTemp"),
     currentTemp: document.getElementById("currentTemp"),
     targetTemp: document.getElementById("targetTemp"),
@@ -133,6 +157,7 @@
   function localeForCurrentLang() {
     if (currentLang === "fr") return "fr-FR";
     if (currentLang === "es") return "es-ES";
+    if (currentLang === "zh") return "zh-CN";
     return "en-US";
   }
 
@@ -336,12 +361,13 @@
   }
 
   function updateLanguageButtons() {
-    [el.btnLangFr, el.btnLangEn, el.btnLangEs].forEach(function (btn) {
+    [el.btnLangFr, el.btnLangEn, el.btnLangEs, el.btnLangZh].forEach(function (btn) {
       if (!btn) return;
       btn.classList.remove("active");
     });
     if (currentLang === "fr" && el.btnLangFr) el.btnLangFr.classList.add("active");
     else if (currentLang === "es" && el.btnLangEs) el.btnLangEs.classList.add("active");
+    else if (currentLang === "zh" && el.btnLangZh) el.btnLangZh.classList.add("active");
     else if (el.btnLangEn) el.btnLangEn.classList.add("active");
   }
 
@@ -451,6 +477,7 @@
   if (el.btnLangFr) el.btnLangFr.addEventListener("click", function () { setLanguage("fr"); });
   if (el.btnLangEn) el.btnLangEn.addEventListener("click", function () { setLanguage("en"); });
   if (el.btnLangEs) el.btnLangEs.addEventListener("click", function () { setLanguage("es"); });
+  if (el.btnLangZh) el.btnLangZh.addEventListener("click", function () { setLanguage("zh"); });
 
   currentLang = loadSavedLanguage();
   applyTranslations();
