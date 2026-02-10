@@ -41,6 +41,16 @@ Pour que le panneau ressemble à une app et s’ouvre en plein écran :
 
 Ensuite, lancez **cette icône** puis activez l’**Accès guidé** (triple-clic). L’iPad sera verrouillé sur cette « app » uniquement.
 
+### Mise à jour quand la page est sur l’écran d’accueil
+
+iOS et Safari mettent en cache les pages ajoutées à l’écran d’accueil. Après avoir mis à jour les fichiers sur le serveur (HA), vous pouvez avoir l’impression que l’ancienne version s’affiche encore.
+
+**À faire :**
+
+1. **Incrémenter la version dans `index.html`** : les scripts et la CSS sont chargés avec `?v=1`. Après un déploiement, changez en `?v=2`, puis `?v=3`, etc. (dans les trois endroits : `styles.css?v=…`, `config.js?v=…`, `app.js?v=…`). Recopiez `index.html` sur le serveur. Au prochain chargement, le navigateur téléchargera les nouveaux fichiers.
+2. **Supprimer puis recréer le raccourci** : sur l’iPad, maintenir l’icône Thermostat sur l’écran d’accueil → **Supprimer l’app** (ou **Retirer**). Puis dans Safari, rouvrir l’URL du panneau et **Sur l’écran d’accueil** à nouveau.
+3. **Effacer les données du site** (si besoin) : Réglages → Safari → Avancé → Données des sites web → chercher votre domaine → supprimer. Puis rouvrir la page et éventuellement la rajouter à l’écran d’accueil.
+
 ---
 
 ## 3. Réglages recommandés pour un panneau mural

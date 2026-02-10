@@ -3,11 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
   <title>Thermostat</title>
-  <link rel="stylesheet" href="styles.css">
+  <!-- Incrémenter ?v= après chaque déploiement pour forcer le rechargement (écran d'accueil, cache) -->
+  <link rel="stylesheet" href="styles.css?v=1">
 </head>
 <body>
   <div id="app">
@@ -51,7 +55,7 @@
     </footer>
   </div>
 
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+  <script src="config.js?v=1"></script>
+  <script src="app.js?v=1"></script>
 </body>
 </html>
