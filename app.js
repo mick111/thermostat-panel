@@ -13,7 +13,6 @@
   var entityId = CONFIG.thermostatEntityId;
   var step = CONFIG.stepDegrees;
   var refreshInterval = CONFIG.refreshInterval;
-  var allowedPresets = ["away", "comfort", "eco", "sleep"];
 
   var el = {
     status: document.getElementById("status"),
@@ -25,12 +24,10 @@
     btnDown: document.getElementById("btnDown"),
     modeLabel: document.getElementById("modeLabel"),
     dialFill: document.getElementById("dialFill"),
-    modeValue: document.getElementById("modeValue"),
-    presetValue: document.getElementById("presetValue"),
-    btnMode: document.getElementById("btnMode"),
-    btnPresetMain: document.getElementById("btnPresetMain"),
-    presetCard: document.getElementById("presetCard"),
-    presetButtons: document.getElementById("presetButtons")
+    btnPresetAway: document.getElementById("btnPresetAway"),
+    btnPresetComfort: document.getElementById("btnPresetComfort"),
+    btnPresetEco: document.getElementById("btnPresetEco"),
+    btnPresetSleep: document.getElementById("btnPresetSleep")
   };
 
   var currentState = null;
@@ -120,7 +117,6 @@
 
     var modeState = (state.state || "").toLowerCase();
     el.modeLabel.textContent = modeState === "heat" ? "Heat" : (modeState === "off" ? "Off" : modeState || "—");
-    el.modeValue.textContent = modeState === "heat" ? "Heat" : (modeState === "off" ? "Off" : modeState || "—");
 
     var minT = attrs.min_temp != null ? parseFloat(attrs.min_temp, 10) : 5;
     var maxT = attrs.max_temp != null ? parseFloat(attrs.max_temp, 10) : 35;
@@ -128,24 +124,14 @@
     var angle = maxT > minT ? ((targetNum - minT) / (maxT - minT)) * 360 : 0;
     el.dialFill.style.setProperty("--dial-angle", angle + "deg");
 
-    var presetMode = attrs.preset_mode;
-    var presetModes = attrs.preset_modes || [];
-    var filteredPresets = allowedPresets.filter(function (p) { return presetModes.indexOf(p) !== -1; });
-    el.presetValue.textContent = presetMode ? (presetMode.charAt(0).toUpperCase() + presetMode.slice(1)) : "None";
-    if (filteredPresets.length > 0) {
-      el.presetCard.style.display = "";
-      el.presetButtons.innerHTML = "";
-      filteredPresets.forEach(function (pm) {
-        var btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "btn btn-preset-chip" + (pm === presetMode ? " active" : "");
-        btn.textContent = pm.charAt(0).toUpperCase() + pm.slice(1);
-        btn.addEventListener("click", function () { setPresetMode(pm); });
-        el.presetButtons.appendChild(btn);
-      });
-    } else {
-      el.presetCard.style.display = "none";
-    }
+    var presetMode = (attrs.preset_mode || "").toLowerCase();
+    [el.btnPresetAway, el.btnPresetComfort, el.btnPresetEco, el.btnPresetSleep].forEach(function (btn) {
+      btn.classList.remove("active");
+    });
+    if (presetMode === "away") el.btnPresetAway.classList.add("active");
+    else if (presetMode === "comfort") el.btnPresetComfort.classList.add("active");
+    else if (presetMode === "eco") el.btnPresetEco.classList.add("active");
+    else if (presetMode === "sleep") el.btnPresetSleep.classList.add("active");
 
     el.btnUp.disabled = target != null && parseFloat(target, 10) >= maxT;
     el.btnDown.disabled = target != null && parseFloat(target, 10) <= minT;
@@ -227,11 +213,10 @@
 
   el.btnUp.addEventListener("click", onUp);
   el.btnDown.addEventListener("click", onDown);
-  el.btnMode.addEventListener("click", function () {
-    if (!currentState) return;
-    var modeState = (currentState.state || "").toLowerCase();
-    setHVACMode(modeState === "heat" ? "off" : "heat");
-  });
+  el.btnPresetAway.addEventListener("click", function () { setPresetMode("away"); });
+  el.btnPresetComfort.addEventListener("click", function () { setPresetMode("comfort"); });
+  el.btnPresetEco.addEventListener("click", function () { setPresetMode("eco"); });
+  el.btnPresetSleep.addEventListener("click", function () { setPresetMode("sleep"); });
 
   refresh();
   refreshTimer = setInterval(refresh, refreshInterval);

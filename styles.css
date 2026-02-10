@@ -239,99 +239,45 @@ html, body {
   cursor: not-allowed;
 }
 
-/* Bottom: Mode + Preset buttons (HA style) */
-.actions-row {
+/* Preset buttons: Away, Comfort, Eco, Sleep */
+.presets-row {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
   width: 100%;
   max-width: 320px;
   margin-top: 0.5rem;
 }
 
-.btn-action {
+.btn-preset {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem 0.75rem;
+  min-width: 70px;
+  padding: 0.875rem 0.5rem;
   border-radius: 12px;
   border: 1px solid var(--ha-divider);
   background: var(--ha-surface);
   color: var(--ha-text);
   font-family: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
   box-shadow: 0 1px 3px var(--ha-shadow);
-  transition: box-shadow 0.2s, background 0.2s;
-  min-height: 72px;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.2s;
 }
 
-.btn-action:hover,
-.btn-action:active {
+.btn-preset:hover,
+.btn-preset:active {
   background: #f5f5f5;
   box-shadow: 0 2px 6px var(--ha-shadow-hover);
 }
 
-.btn-action-icon {
-  font-size: 1.25rem;
-  margin-bottom: 0.25rem;
-  opacity: 0.9;
-}
-
-.btn-action-label {
-  font-weight: 500;
-  color: var(--ha-text-secondary);
-  margin-bottom: 0.15rem;
-}
-
-.btn-action-value {
-  font-weight: 600;
-  font-size: 0.9375rem;
-  color: var(--ha-text);
-}
-
-/* Preset chips row */
-.preset-card {
-  display: none;
-  width: 100%;
-  max-width: 320px;
-  margin-top: 0.5rem;
-}
-
-.preset-card .buttons-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
-.btn-preset-chip {
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  border: 1px solid var(--ha-divider);
-  background: var(--ha-surface);
-  color: var(--ha-text);
-  font-family: inherit;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  box-shadow: 0 1px 2px var(--ha-shadow);
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.btn-preset-chip.active {
+.btn-preset.active {
   background: var(--ha-heat-soft);
   border-color: var(--ha-heat);
   color: #1a1a1a;
-}
-
-.btn-preset-chip:active {
-  transform: scale(0.98);
 }
 
 /* Footer */
