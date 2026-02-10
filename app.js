@@ -23,14 +23,14 @@
     activity: 21
   };
   var RING_COLORS_SOFT = {
-    away: "#e1bee7",
+    away: "#d7ccc8",
     eco: "#c8e6c9",
     comfort: "#bbdefb",
     activity: "#ffe0b2",
     over: "#ffcdd2"
   };
   var RING_COLORS_STRONG = {
-    away: "#7b1fa2",
+    away: "#6d4c41",
     eco: "#388e3c",
     comfort: "#1976d2",
     activity: "#ef6c00",
