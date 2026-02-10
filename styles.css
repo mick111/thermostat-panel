@@ -149,10 +149,13 @@ html, body {
   height: 0;
   padding-bottom: 100%;
   border-radius: 50%;
+  z-index: 0;
 }
 
 .dial-bg {
   background: var(--ha-divider);
+  border: 3px solid #bdbdbd;
+  box-sizing: border-box;
 }
 
 .dial-fill {
@@ -164,16 +167,18 @@ html, body {
     var(--ha-divider) var(--dial-angle),
     var(--ha-divider) 180deg
   );
+  border: 3px solid rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
 }
 
 .dial-center {
   position: absolute;
   left: 50%;
   top: 25%;
-  width: 48%;
-  padding-bottom: 48%;
+  width: 46%;
+  padding-bottom: 46%;
   height: 0;
-  margin: -24% 0 0 -24%;
+  margin: -23% 0 0 -23%;
   background: var(--ha-surface);
   border-radius: 50%;
   box-shadow: 0 2px 8px var(--ha-shadow);
@@ -183,6 +188,7 @@ html, body {
   justify-content: center;
   padding: 0;
   box-sizing: content-box;
+  z-index: 1;
 }
 
 .dial-center-inner {
