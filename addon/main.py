@@ -84,7 +84,7 @@ if not _ha_url_raw or _ha_url_raw.lower() == "auto":
 else:
     HA_URL = _ha_url_raw
 HA_URL = HA_URL.rstrip("/")
-TOKEN = str(OPTIONS.get("token", ""))
+TOKEN = str(OPTIONS.get("token", "")).strip()
 try:
     ALLOWED_NETWORKS = [
         ip_network(cidr.strip()) for cidr in OPTIONS.get("allowed_networks", [])
@@ -151,12 +151,28 @@ async def config_js():
     return Response(content=body, media_type="application/javascript")
 
 
+def _ha_response(r: httpx.Response) -> Response:
+    """Renvoie la réponse HA, avec message explicite en cas de 401 (token invalide)."""
+    if r.status_code == 401:
+        return JSONResponse(
+            status_code=401,
+            content={
+                "message": "Token Home Assistant invalide ou expiré. Vérifiez l'option « token » dans la configuration de l'add-on (Profil HA → Créer un jeton).",
+            },
+        )
+    return Response(
+        content=r.content,
+        status_code=r.status_code,
+        headers={"Content-Type": "application/json"},
+    )
+
+
 @app.get("/api/states/{entity_id:path}")
 async def get_state(entity_id: str):
     if not TOKEN:
         return JSONResponse(
             status_code=500,
-            content={"message": "Token HA non configuré dans l'add-on."},
+            content={"message": "Token HA non configuré. Renseignez l'option « token » dans la configuration de l'add-on."},
         )
     url = f"{HA_URL}/api/states/{entity_id}"
     async with httpx.AsyncClient(timeout=10.0) as client:
@@ -167,11 +183,7 @@ async def get_state(entity_id: str):
                 "Content-Type": "application/json",
             },
         )
-    return Response(
-        content=r.content,
-        status_code=r.status_code,
-        headers={"Content-Type": "application/json"},
-    )
+    return _ha_response(r)
 
 
 @app.post("/api/services/climate/set_temperature")
@@ -179,7 +191,7 @@ async def set_temperature(request: Request):
     if not TOKEN:
         return JSONResponse(
             status_code=500,
-            content={"message": "Token HA non configuré dans l'add-on."},
+            content={"message": "Token HA non configuré. Renseignez l'option « token » dans la configuration de l'add-on."},
         )
     body = await request.body()
     url = f"{HA_URL}/api/services/climate/set_temperature"
@@ -192,11 +204,7 @@ async def set_temperature(request: Request):
                 "Content-Type": "application/json",
             },
         )
-    return Response(
-        content=r.content,
-        status_code=r.status_code,
-        headers={"Content-Type": "application/json"},
-    )
+    return _ha_response(r)
 
 
 @app.post("/api/services/climate/set_preset_mode")
@@ -204,7 +212,7 @@ async def set_preset_mode(request: Request):
     if not TOKEN:
         return JSONResponse(
             status_code=500,
-            content={"message": "Token HA non configuré dans l'add-on."},
+            content={"message": "Token HA non configuré. Renseignez l'option « token » dans la configuration de l'add-on."},
         )
     body = await request.body()
     url = f"{HA_URL}/api/services/climate/set_preset_mode"
@@ -217,11 +225,7 @@ async def set_preset_mode(request: Request):
                 "Content-Type": "application/json",
             },
         )
-    return Response(
-        content=r.content,
-        status_code=r.status_code,
-        headers={"Content-Type": "application/json"},
-    )
+    return _ha_response(r)
 
 
 # Panel intégré : fichiers statiques (après les routes /api et /config.js)
