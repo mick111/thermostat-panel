@@ -11,7 +11,7 @@ Add-on qui expose une API FastAPI en proxy vers Home Assistant **et sert le pane
 
 - **port** : port d'écoute (défaut 8765). Doit correspondre au port exposé dans l'onglet Réseau de l'add-on.
 - **ha_url** : URL de l'API Home Assistant (voir ci-dessous). Valeur par défaut : **`auto`** (détection automatique).
-- **token** : Long-Lived Access Token (Profil HA → Créer un jeton). Obligatoire pour les add-ons installés depuis un dépôt personnalisé (le Supervisor ne fournit pas toujours son token). Avec `auto`, si vous renseignez le token, l'add-on contacte Core directement (`http://homeassistant:8123`) pour que le token soit accepté.
+- **token** : Long-Lived Access Token (Profil HA → Créer un jeton). Obligatoire pour les add-ons installés depuis un dépôt personnalisé (le Supervisor ne fournit pas toujours son token). Avec `auto`, si vous renseignez le token, l'add-on contacte Core directement (`http://homeassistant:8123`) pour que le token soit accepté. **Attention** : sur certaines installations, l'accès direct à Core depuis l'add-on peut échouer (connexion refusée ou interrompue). Dans ce cas vous verrez une erreur 502 avec des pistes : utiliser `ha_url: http://supervisor/core` et laisser token vide si l'add-on est installé depuis le store officiel, ou indiquer une URL personnalisée vers votre instance Core.
 - **allowed_networks** : liste de réseaux CIDR autorisés (ex. `192.168.0.0/24`, `10.0.0.0/8`). Seules les requêtes dont l'IP source est dans l'un de ces réseaux sont acceptées.
 - **thermostat_entity_id**, **guest_entity_id**, **guest_count_entity_id**, **guest_dates_entity_id** : entités HA pour le panel.
 - **step_degrees**, **refresh_interval** : pas de température et intervalle de rafraîchissement (ms).
@@ -27,6 +27,10 @@ L’add-on doit joindre l’API HTTP de Home Assistant (Core) pour lire les éta
 | **`http://localhost:8123`** | Home Assistant Core installé **sans** Supervisor (Docker seul, venv, etc.) | L’API écoute sur la même machine, port 8123. Si l’add-on est dans un conteneur sur le même host, selon le réseau Docker il peut falloir utiliser l’IP du host (ex. `http://172.17.0.1:8123`) au lieu de `localhost`. |
 
 En résumé : laisser **`auto`** pour une installation classique ; ne renseigner une URL explicite que si la détection automatique ne convient pas (environnement particulier ou dépannage).
+
+### Permissions add-on
+
+L'add-on active `homeassistant_api: true` **et** `hassio_api: true` dans `config.yaml` pour obtenir `SUPERVISOR_TOKEN` quand le Supervisor l'expose, et accéder à l'API Core via le proxy `http://supervisor/core/api/`.
 
 ## Utilisation
 

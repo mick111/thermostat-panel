@@ -1,5 +1,5 @@
 name: "Thermostat Panel API"
-version: "1.0.7"
+version: "1.0.8"
 slug: thermostat_panel_api
 description: "Backend FastAPI pour le panel thermostat. Proxy vers l'API Home Assistant avec token côté serveur et restriction aux IP locales."
 arch:
@@ -11,6 +11,7 @@ arch:
 startup: application
 init: false
 homeassistant_api: true
+hassio_api: true
 ports:
   8765/tcp: 8765
 ports_description:

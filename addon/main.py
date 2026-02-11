@@ -186,6 +186,32 @@ def _ha_response(r: httpx.Response) -> Response:
     )
 
 
+# Message lorsque Core est injoignable (connexion directe homeassistant:8123 souvent indisponible sur dépôt perso)
+_MSG_HA_UNREACHABLE = (
+    "Impossible de joindre Home Assistant (connexion refusée ou interrompue). "
+    "Avec un add-on installé depuis un dépôt personnalisé, l'accès direct à Core (homeassistant:8123) "
+    "peut ne pas être disponible. Essayez : (1) ha_url = « http://supervisor/core » et token vide "
+    "(nécessite un add-on du store officiel pour SUPERVISOR_TOKEN), ou (2) une URL personnalisée si votre Core est joignable autrement."
+)
+
+
+async def _ha_request(method: str, url: str, **kwargs) -> Response:
+    """Effectue une requête vers HA et gère les erreurs réseau (502 + message clair)."""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            if method == "GET":
+                r = await client.get(url, **kwargs)
+            else:
+                r = await client.request(method, url, **kwargs)
+        return _ha_response(r)
+    except (httpx.RemoteProtocolError, httpx.ConnectError, httpx.ConnectTimeout) as e:
+        logger.warning("Connexion HA échouée (%s): %s", url, e)
+        return JSONResponse(
+            status_code=502,
+            content={"message": _MSG_HA_UNREACHABLE, "detail": str(e)},
+        )
+
+
 @app.get("/api/states/{entity_id:path}")
 async def get_state(entity_id: str):
     if not TOKEN:
@@ -196,15 +222,14 @@ async def get_state(entity_id: str):
             },
         )
     url = f"{HA_URL}/api/states/{entity_id}"
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        r = await client.get(
-            url,
-            headers={
-                "Authorization": f"Bearer {TOKEN}",
-                "Content-Type": "application/json",
-            },
-        )
-    return _ha_response(r)
+    return await _ha_request(
+        "GET",
+        url,
+        headers={
+            "Authorization": f"Bearer {TOKEN}",
+            "Content-Type": "application/json",
+        },
+    )
 
 
 @app.post("/api/services/climate/set_temperature")
@@ -218,16 +243,15 @@ async def set_temperature(request: Request):
         )
     body = await request.body()
     url = f"{HA_URL}/api/services/climate/set_temperature"
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        r = await client.post(
-            url,
-            content=body,
-            headers={
-                "Authorization": f"Bearer {TOKEN}",
-                "Content-Type": "application/json",
-            },
-        )
-    return _ha_response(r)
+    return await _ha_request(
+        "POST",
+        url,
+        content=body,
+        headers={
+            "Authorization": f"Bearer {TOKEN}",
+            "Content-Type": "application/json",
+        },
+    )
 
 
 @app.post("/api/services/climate/set_preset_mode")
@@ -241,16 +265,15 @@ async def set_preset_mode(request: Request):
         )
     body = await request.body()
     url = f"{HA_URL}/api/services/climate/set_preset_mode"
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        r = await client.post(
-            url,
-            content=body,
-            headers={
-                "Authorization": f"Bearer {TOKEN}",
-                "Content-Type": "application/json",
-            },
-        )
-    return _ha_response(r)
+    return await _ha_request(
+        "POST",
+        url,
+        content=body,
+        headers={
+            "Authorization": f"Bearer {TOKEN}",
+            "Content-Type": "application/json",
+        },
+    )
 
 
 # Panel intégré : fichiers statiques (après les routes /api et /config.js)
