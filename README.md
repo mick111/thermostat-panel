@@ -25,7 +25,7 @@ The panel calls a **backend API** (add-on Thermostat Panel API) which proxies re
    - Cliquer sur l’add-on → **Installer** → attendre la fin du build.
 
 4. **Configurer et démarrer**  
-   - Onglet **Configuration** : renseigner `ha_url`, `token` (jeton HA), `allowed_networks`, et les options du panel (`thermostat_entity_id`, etc.).  
+   - Onglet **Configuration** : renseigner `token` (jeton HA), `allowed_networks` (et éventuellement `ha_url` si besoin), et les options du panel (`thermostat_entity_id`, etc.).  
    - Onglet **Réseau** : le port (ex. 8765) doit être exposé.  
    - **Démarrer** l’add-on.
 
@@ -33,7 +33,7 @@ Ensuite, ouvrir **http://IP_DE_HA:8765/** (ou le port choisi) depuis un appareil
 
 ## Configuration
 
-Une fois l’add-on installé, tout se règle dans ses **options** : `ha_url`, `token`, `allowed_networks`, `thermostat_entity_id`, `guest_entity_id`, etc. (voir la section ci-dessus pour l’installation et le démarrage).
+Une fois l’add-on installé, tout se règle dans ses **options** : `token`, `allowed_networks`, `thermostat_entity_id`, `guest_entity_id`, etc. L’option **`ha_url`** peut rester sur **`auto`** (détection automatique) ; voir **addon/README.md** pour les détails.
 
 ## iPad lock-down
 

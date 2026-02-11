@@ -38,7 +38,7 @@ def _load_options():
         except Exception as e:
             logger.warning("Could not read /data/options.json: %s", e)
     # Complément / override par l'env
-    opts.setdefault("ha_url", os.environ.get("HA_URL", "http://supervisor/core"))
+    opts.setdefault("ha_url", os.environ.get("HA_URL", "auto"))
     opts.setdefault("token", os.environ.get("TOKEN", ""))
     opts.setdefault("port", int(os.environ.get("PORT", "8765")))
     allowed = opts.get("allowed_networks")
@@ -52,8 +52,38 @@ def _load_options():
     opts["allowed_networks"] = allowed
     return opts
 
+
+def _detect_ha_url(token: str) -> str:
+    """Détecte automatiquement l'URL de l'API Home Assistant."""
+    candidates = [
+        "http://supervisor/core",   # Add-on installé via Supervisor (HA OS / Supervised)
+        "http://localhost:8123",   # Core en local (sans Supervisor)
+    ]
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    for base in candidates:
+        try:
+            with httpx.Client(timeout=2.0) as client:
+                r = client.get(f"{base}/api/", headers=headers)
+                # 200 OK ou 401 Unauthorized = l'API répond
+                if r.status_code in (200, 401):
+                    logger.info("HA URL auto-détectée : %s", base)
+                    return base
+        except Exception as e:
+            logger.debug("Tentative %s : %s", base, e)
+    # Par défaut Supervisor (cas add-on standard)
+    logger.warning("Auto-détection impossible, utilisation de http://supervisor/core")
+    return "http://supervisor/core"
+
+
 OPTIONS = _load_options()
-HA_URL = str(OPTIONS.get("ha_url", "http://supervisor/core")).rstrip("/")
+_ha_url_raw = str(OPTIONS.get("ha_url", "auto")).strip().rstrip("/")
+if not _ha_url_raw or _ha_url_raw.lower() == "auto":
+    HA_URL = _detect_ha_url(OPTIONS.get("token") or "")
+else:
+    HA_URL = _ha_url_raw
+HA_URL = HA_URL.rstrip("/")
 TOKEN = str(OPTIONS.get("token", ""))
 try:
     ALLOWED_NETWORKS = [
