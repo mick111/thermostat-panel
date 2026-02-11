@@ -55,9 +55,12 @@ def _load_options():
 
 def _detect_ha_url(token: str) -> str:
     """Détecte automatiquement l'URL de l'API Home Assistant."""
+    # Avec token : supervisor/core (SUPERVISOR_TOKEN) ou homeassistant:8123 (Long-Lived token)
+    # Sans token : seulement supervisor/core (SUPERVISOR_TOKEN sera utilisé au démarrage)
     candidates = [
-        "http://supervisor/core",   # Add-on installé via Supervisor (HA OS / Supervised)
-        "http://localhost:8123",   # Core en local (sans Supervisor)
+        "http://supervisor/core",
+        "http://homeassistant:8123",  # Accès direct à Core (réseau interne), accepte le Long-Lived token
+        "http://localhost:8123",
     ]
     headers = {"Content-Type": "application/json"}
     if token:
@@ -66,14 +69,11 @@ def _detect_ha_url(token: str) -> str:
         try:
             with httpx.Client(timeout=2.0) as client:
                 r = client.get(f"{base}/api/", headers=headers)
-                # 200 OK ou 401 Unauthorized = l'API répond
                 if r.status_code in (200, 401):
                     logger.info("HA URL auto-détectée : %s", base)
                     return base
         except Exception as e:
             logger.debug("Tentative %s : %s", base, e)
-    # Par défaut Supervisor (cas add-on standard)
-    logger.warning("Auto-détection impossible, utilisation de http://supervisor/core")
     return "http://supervisor/core"
 
 
@@ -84,15 +84,16 @@ if not _ha_url_raw or _ha_url_raw.lower() == "auto":
 else:
     HA_URL = _ha_url_raw
 HA_URL = HA_URL.rstrip("/")
-# Via supervisor/core : le Supervisor injecte normalement SUPERVISOR_TOKEN. S'il est absent (ex. add-on
-# depuis un dépôt personnalisé), on utilise le token des options (Long-Lived Access Token).
-# Avec localhost:8123, seul le token des options est utilisé.
+# supervisor/core n'accepte que SUPERVISOR_TOKEN (pas le Long-Lived token).
+# Si on a un token utilisateur mais pas SUPERVISOR_TOKEN, on contacte Core directement via homeassistant:8123.
 if "supervisor/core" in HA_URL:
     TOKEN = (os.environ.get("SUPERVISOR_TOKEN") or "").strip()
     if not TOKEN:
         TOKEN = str(OPTIONS.get("token", "")).strip()
         if TOKEN:
-            logger.info("Utilisation du token des options (SUPERVISOR_TOKEN non fourni par le Supervisor).")
+            # Le proxy supervisor/core ne forward pas le Long-Lived token → on utilise l'accès direct à Core
+            HA_URL = "http://homeassistant:8123"
+            logger.info("Utilisation du token des options vers http://homeassistant:8123 (Core direct).")
     else:
         logger.info("Utilisation du token Supervisor pour l'API Core.")
 else:
