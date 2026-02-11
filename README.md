@@ -2,24 +2,19 @@
 
 Minimal web app to control a Home Assistant thermostat from an iPad in kiosk mode (wall mount). Compatible with **iOS 9.3** (XMLHttpRequest only, no fetch).
 
+The panel calls a **backend API** (add-on Thermostat Panel API) which proxies requests to Home Assistant. The token stays on the server; only clients on allowed local IPs can use the API. See **SECURITE.md**.
+
 ## Files
 
-- **index.html** — Main page (temperature, setpoint, mode, buttons)
-- **styles.css** — Full-screen, touch-friendly layout
-- **app.js** — Home Assistant API calls (state read, set_temperature, set_hvac_mode)
-- **config.js** — Edit this: HA URL, token, thermostat entity_id (token is visible client-side; see **SECURITE.md**)
-- **VERROUILLAGE.md** — How to lock the iPad (Guided Access + settings)
+- **addon/** — Home Assistant add-on (FastAPI) : proxy vers HA, restriction par IP, et **service du panel** (ouvrir l’URL de l’add-on pour l’utiliser).
+  - **addon/static/** — Fichiers du panel (index.html, app.js, styles.css, apple-touch-icon.png). Modifier ici pour faire évoluer le panel.
+- **VERROUILLAGE.md** — Verrouillage iPad (Accès guidé).
 
 ## Configuration
 
-1. Edit **config.js**:
-   - `baseUrl`: Home Assistant URL (e.g. `https://homeassistant.local:8123`)
-   - `token`: Long-Lived Access Token (Profile → Create token)
-   - `thermostatEntityId`: e.g. `climate.living_room`, `climate.thermostat`
-   - `guestEntityId`: e.g. `sensor.guest_name`.
-2. Serve the files over HTTPS (required for the API from a web page). Options:
-   - Home Assistant **http** module: add the folder to `config/www/` and access via `https://YOUR_HA:8123/local/thermostat-panel/`
-   - Or any other web server (nginx, Apache, etc.) over HTTPS on your network
+1. **Installer et configurer l’add-on** (Thermostat Panel API).
+2. Dans les options de l’add-on : `ha_url`, `token`, `allowed_networks`, et les options du panel (`thermostat_entity_id`, `guest_entity_id`, etc.).
+3. Démarrer l’add-on, puis ouvrir **http://IP_HA:8765/** (ou le port configuré) depuis un appareil du réseau local. Le panel est servi par l’add-on.
 
 ## iPad lock-down
 
@@ -27,10 +22,10 @@ To restrict the iPad to this panel only: **Guided Access** (Settings → Accessi
 
 ## Home Assistant requirements
 
-- REST API enabled (default with the frontend)
-- **climate** entity for the thermostat
-- Token with permission to call services
+- **Thermostat Panel API add-on** installed and running (token and allowed_networks configured).
+- **climate** entity for the thermostat.
+- Long-Lived Access Token (stored in the add-on, not in the browser) with permission to read states and call climate services.
 
-## “Auto” mode
+## Mode « Auto »
 
-If your thermostat uses `heat_cool` instead of `auto`, change the Auto button in **app.js**: replace `setHVACMode("auto")` with `setHVACMode("heat_cool")`.
+Si le thermostat utilise `heat_cool` au lieu de `auto`, modifier le bouton Auto dans **addon/static/app.js** : remplacer `setHVACMode("auto")` par `setHVACMode("heat_cool")`.

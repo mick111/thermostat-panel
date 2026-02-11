@@ -9,7 +9,6 @@
   var baseUrl = (CONFIG.baseUrl === "auto" || !CONFIG.baseUrl)
     ? (window.location.origin || "").replace(/\/$/, "")
     : CONFIG.baseUrl.replace(/\/$/, "");
-  var token = (typeof CONFIG.token === "string" ? CONFIG.token : "").trim();
   var thermostatEntityId = CONFIG.thermostatEntityId;
   var guestEntityId = CONFIG.guestEntityId || "sensor.guest_name";
   var guestCountEntityId = CONFIG.guestCountEntityId || "sensor.guest_count";
@@ -49,8 +48,9 @@
       statusLoading: "Loading…",
       statusConnected: "Connected",
       statusErrorPrefix: "Error: ",
-      statusTokenMissing: "Set the token in config.js (HA Profile → Create token)",
-      error401Hint: " Check the token in config.js (HA Profile → Create token) and that baseUrl points to Home Assistant.",
+      statusApiConfigMissing: "Set baseUrl in config.js to the Thermostat Panel API (e.g. http://HA_IP:8765).",
+      error401Hint: " Check baseUrl and that the API add-on is running.",
+      error403Hint: " Access denied. Use the panel from the local network only.",
       networkUnavailable: "Network unavailable",
       labelCurrentTemperature: "Current temperature",
       lastUpdatePrefix: "Last update: ",
@@ -79,8 +79,9 @@
       statusLoading: "Chargement…",
       statusConnected: "Connecté",
       statusErrorPrefix: "Erreur : ",
-      statusTokenMissing: "Configurez le token dans config.js (Profil HA → Créer un jeton)",
-      error401Hint: " Vérifiez le token dans config.js (Profil HA → Créer un jeton) et que baseUrl pointe bien vers Home Assistant.",
+      statusApiConfigMissing: "Configurez baseUrl dans config.js (URL de l'add-on API, ex. http://HA_IP:8765).",
+      error401Hint: " Vérifiez baseUrl et que l'add-on API est démarré.",
+      error403Hint: " Accès refusé. Utilisez le panel depuis le réseau local uniquement.",
       networkUnavailable: "Réseau indisponible",
       labelCurrentTemperature: "Température actuelle",
       lastUpdatePrefix: "Dernière mise à jour : ",
@@ -109,8 +110,9 @@
       statusLoading: "Cargando…",
       statusConnected: "Conectado",
       statusErrorPrefix: "Error: ",
-      statusTokenMissing: "Configure el token en config.js (Perfil HA → Crear token)",
-      error401Hint: " Verifique el token en config.js (Perfil HA → Crear token) y que baseUrl apunte a Home Assistant.",
+      statusApiConfigMissing: "Configure baseUrl en config.js (URL del add-on API, ej. http://HA_IP:8765).",
+      error401Hint: " Verifique baseUrl y que el add-on API esté en ejecución.",
+      error403Hint: " Acceso denegado. Use el panel solo desde la red local.",
       networkUnavailable: "Red no disponible",
       labelCurrentTemperature: "Temperatura actual",
       lastUpdatePrefix: "Última actualización: ",
@@ -139,8 +141,9 @@
       statusLoading: "加载中…",
       statusConnected: "已连接",
       statusErrorPrefix: "错误：",
-      statusTokenMissing: "请在 config.js 中设置令牌（HA 个人资料 → 创建令牌）",
-      error401Hint: " 请检查 config.js 中的令牌（HA 个人资料 → 创建令牌），并确认 baseUrl 指向 Home Assistant。",
+      statusApiConfigMissing: "请在 config.js 中设置 baseUrl（API 插件地址，例如 http://HA_IP:8765）。",
+      error401Hint: " 请检查 baseUrl 并确认 API 插件已启动。",
+      error403Hint: " 拒绝访问。请仅在本地网络使用本面板。",
       networkUnavailable: "网络不可用",
       labelCurrentTemperature: "当前温度",
       lastUpdatePrefix: "最后更新：",
@@ -305,12 +308,6 @@
     setStatus(t("statusConnected"), "connected");
   }
 
-  function setStatusTokenMissing() {
-    lastStatusType = "token_missing";
-    lastStatusErrorMessage = "";
-    setStatus(t("statusTokenMissing"), "error");
-  }
-
   function setStatusErrorMessage(rawMessage) {
     lastStatusType = "error";
     lastStatusErrorMessage = rawMessage || "";
@@ -320,8 +317,6 @@
   function rerenderStatusForLanguage() {
     if (lastStatusType === "connected") {
       setStatus(t("statusConnected"), "connected");
-    } else if (lastStatusType === "token_missing") {
-      setStatus(t("statusTokenMissing"), "error");
     } else if (lastStatusType === "error") {
       setStatus(t("statusErrorPrefix") + lastStatusErrorMessage, "error");
     } else {
@@ -410,7 +405,6 @@
     var url = baseUrl + path;
     var xhr = new XMLHttpRequest();
     xhr.open(method, url, true);
-    xhr.setRequestHeader("Authorization", "Bearer " + token);
     xhr.setRequestHeader("Content-Type", "application/json");
 
     xhr.onreadystatechange = function () {
@@ -425,9 +419,8 @@
         callback(null, response);
       } else {
         var msg = "HTTP " + status + (response && response.message ? " — " + response.message : "");
-        if (status === 401) {
-          msg += t("error401Hint");
-        }
+        if (status === 401) msg += t("error401Hint");
+        else if (status === 403) msg += t("error403Hint");
         callback(new Error(msg), null);
       }
     };
@@ -682,8 +675,10 @@
   }
 
   function refresh() {
-    if (!token || token === "VOTRE_TOKEN_ICI") {
-      setStatusTokenMissing();
+    if (!baseUrl) {
+      lastStatusType = "error";
+      lastStatusErrorMessage = t("statusApiConfigMissing");
+      setStatus(t("statusErrorPrefix") + lastStatusErrorMessage, "error");
       return;
     }
     loadState(function (err, state) {

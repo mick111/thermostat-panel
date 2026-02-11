@@ -1,0 +1,43 @@
+name: "Thermostat Panel API"
+version: "1.0.0"
+slug: thermostat_panel_api
+description: "Backend FastAPI pour le panel thermostat. Proxy vers l'API Home Assistant avec token côté serveur et restriction aux IP locales."
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+startup: application
+homeassistant_api: true
+ports:
+  8765/tcp: 8765
+ports_description:
+  8765/tcp: "Port d'écoute de l'API (configurable dans les options)"
+options:
+  port: 8765
+  ha_url: "http://supervisor/core"
+  token: ""
+  allowed_networks:
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"
+    - "127.0.0.0/8"
+  thermostat_entity_id: "climate.thermostat"
+  guest_entity_id: "sensor.guest_name"
+  guest_count_entity_id: "sensor.guest_count"
+  guest_dates_entity_id: "sensor.guest_dates"
+  step_degrees: 0.5
+  refresh_interval: 10000
+schema:
+  port: "port"
+  ha_url: "str"
+  token: "str"
+  allowed_networks:
+    - "str"
+  thermostat_entity_id: "str"
+  guest_entity_id: "str"
+  guest_count_entity_id: "str"
+  guest_dates_entity_id: "str"
+  step_degrees: "float"
+  refresh_interval: "int"
