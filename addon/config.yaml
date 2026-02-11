@@ -1,5 +1,5 @@
 name: "Thermostat Panel API"
-version: "1.0.1"
+version: "1.0.2"
 slug: thermostat_panel_api
 description: "Backend FastAPI pour le panel thermostat. Proxy vers l'API Home Assistant avec token côté serveur et restriction aux IP locales."
 arch:
