@@ -84,13 +84,25 @@ if not _ha_url_raw or _ha_url_raw.lower() == "auto":
 else:
     HA_URL = _ha_url_raw
 HA_URL = HA_URL.rstrip("/")
-# Via supervisor/core, le Supervisor injecte SUPERVISOR_TOKEN (doc HA : utiliser ce token pour l'API Core).
-# Sinon (ex. localhost:8123), utiliser le token configuré dans les options.
-if "supervisor/core" in HA_URL and os.environ.get("SUPERVISOR_TOKEN"):
-    TOKEN = os.environ["SUPERVISOR_TOKEN"].strip()
-    logger.info("Utilisation du token Supervisor pour l'API Core.")
+# Via supervisor/core : le Supervisor injecte normalement SUPERVISOR_TOKEN. S'il est absent (ex. add-on
+# depuis un dépôt personnalisé), on utilise le token des options (Long-Lived Access Token).
+# Avec localhost:8123, seul le token des options est utilisé.
+if "supervisor/core" in HA_URL:
+    TOKEN = (os.environ.get("SUPERVISOR_TOKEN") or "").strip()
+    if not TOKEN:
+        TOKEN = str(OPTIONS.get("token", "")).strip()
+        if TOKEN:
+            logger.info("Utilisation du token des options (SUPERVISOR_TOKEN non fourni par le Supervisor).")
+    else:
+        logger.info("Utilisation du token Supervisor pour l'API Core.")
 else:
     TOKEN = str(OPTIONS.get("token", "")).strip()
+
+if not TOKEN and "supervisor/core" in HA_URL:
+    logger.warning(
+        "SUPERVISOR_TOKEN non fourni et option « token » vide. "
+        "Renseignez un Long-Lived Access Token dans la configuration de l'add-on (Profil HA → Créer un jeton)."
+    )
 try:
     ALLOWED_NETWORKS = [
         ip_network(cidr.strip()) for cidr in OPTIONS.get("allowed_networks", [])
@@ -179,7 +191,7 @@ async def get_state(entity_id: str):
         return JSONResponse(
             status_code=500,
             content={
-                "message": "Authentification HA manquante. Avec supervisor/core laissez « token » vide (le Supervisor fournit le jeton). Avec localhost:8123 renseignez un Long-Lived Access Token (Profil HA → Créer un jeton).",
+                "message": "Authentification HA manquante. Renseignez l'option « token » dans la configuration de l'add-on avec un Long-Lived Access Token (Profil HA → Créer un jeton), puis redémarrez l'add-on.",
             },
         )
     url = f"{HA_URL}/api/states/{entity_id}"
