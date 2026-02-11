@@ -11,7 +11,7 @@ Add-on qui expose une API FastAPI en proxy vers Home Assistant **et sert le pane
 
 - **port** : port d'écoute (défaut 8765). Doit correspondre au port exposé dans l'onglet Réseau de l'add-on.
 - **ha_url** : URL de l'API Home Assistant (voir ci-dessous). Valeur par défaut : **`auto`** (détection automatique).
-- **token** : Long-Lived Access Token (Profil HA → Créer un jeton).
+- **token** : Obligatoire seulement si vous utilisez `http://localhost:8123` (sans Supervisor). Avec `auto` ou `http://supervisor/core`, l'add-on utilise automatiquement le token fourni par le Supervisor ; vous pouvez laisser ce champ vide.
 - **allowed_networks** : liste de réseaux CIDR autorisés (ex. `192.168.0.0/24`, `10.0.0.0/8`). Seules les requêtes dont l'IP source est dans l'un de ces réseaux sont acceptées.
 - **thermostat_entity_id**, **guest_entity_id**, **guest_count_entity_id**, **guest_dates_entity_id** : entités HA pour le panel.
 - **step_degrees**, **refresh_interval** : pas de température et intervalle de rafraîchissement (ms).

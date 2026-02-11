@@ -84,7 +84,13 @@ if not _ha_url_raw or _ha_url_raw.lower() == "auto":
 else:
     HA_URL = _ha_url_raw
 HA_URL = HA_URL.rstrip("/")
-TOKEN = str(OPTIONS.get("token", "")).strip()
+# Via supervisor/core, le Supervisor injecte SUPERVISOR_TOKEN (doc HA : utiliser ce token pour l'API Core).
+# Sinon (ex. localhost:8123), utiliser le token configuré dans les options.
+if "supervisor/core" in HA_URL and os.environ.get("SUPERVISOR_TOKEN"):
+    TOKEN = os.environ["SUPERVISOR_TOKEN"].strip()
+    logger.info("Utilisation du token Supervisor pour l'API Core.")
+else:
+    TOKEN = str(OPTIONS.get("token", "")).strip()
 try:
     ALLOWED_NETWORKS = [
         ip_network(cidr.strip()) for cidr in OPTIONS.get("allowed_networks", [])
@@ -172,7 +178,9 @@ async def get_state(entity_id: str):
     if not TOKEN:
         return JSONResponse(
             status_code=500,
-            content={"message": "Token HA non configuré. Renseignez l'option « token » dans la configuration de l'add-on."},
+            content={
+                "message": "Authentification HA manquante. Avec supervisor/core laissez « token » vide (le Supervisor fournit le jeton). Avec localhost:8123 renseignez un Long-Lived Access Token (Profil HA → Créer un jeton).",
+            },
         )
     url = f"{HA_URL}/api/states/{entity_id}"
     async with httpx.AsyncClient(timeout=10.0) as client:
@@ -191,7 +199,9 @@ async def set_temperature(request: Request):
     if not TOKEN:
         return JSONResponse(
             status_code=500,
-            content={"message": "Token HA non configuré. Renseignez l'option « token » dans la configuration de l'add-on."},
+            content={
+                "message": "Authentification HA manquante. Avec supervisor/core laissez « token » vide. Avec localhost:8123 renseignez un Long-Lived Access Token.",
+            },
         )
     body = await request.body()
     url = f"{HA_URL}/api/services/climate/set_temperature"
@@ -212,7 +222,9 @@ async def set_preset_mode(request: Request):
     if not TOKEN:
         return JSONResponse(
             status_code=500,
-            content={"message": "Token HA non configuré. Renseignez l'option « token » dans la configuration de l'add-on."},
+            content={
+                "message": "Authentification HA manquante. Avec supervisor/core laissez « token » vide. Avec localhost:8123 renseignez un Long-Lived Access Token.",
+            },
         )
     body = await request.body()
     url = f"{HA_URL}/api/services/climate/set_preset_mode"
