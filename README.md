@@ -10,11 +10,30 @@ The panel calls a **backend API** (add-on Thermostat Panel API) which proxies re
   - **addon/static/** — Fichiers du panel (index.html, app.js, styles.css, apple-touch-icon.png). Modifier ici pour faire évoluer le panel.
 - **VERROUILLAGE.md** — Verrouillage iPad (Accès guidé).
 
+## Ajouter l’add-on à Home Assistant
+
+1. **Pousser ce projet sur un dépôt Git** (GitHub, Gitea, etc.) si ce n’est pas déjà fait. L’add-on doit être dans le sous-dossier **addon/** (avec `config.yaml`, `Dockerfile`, `run.sh`, `main.py`, `static/` à l’intérieur).
+
+2. **Ajouter le dépôt dans Home Assistant**  
+   - **Paramètres** → **Add-ons** → **Add-on store**  
+   - En haut à droite, cliquer sur **⋮** (menu) → **Repositories**  
+   - Ajouter l’URL du dépôt (ex. `https://github.com/VOTRE_UTILISATEUR/thermostat-panel`) puis **Valider**.
+
+3. **Installer l’add-on**  
+   - Recharger la page du Add-on store si besoin.  
+   - Chercher **« Thermostat Panel API »** (ou le nom du dépôt dans la liste).  
+   - Cliquer sur l’add-on → **Installer** → attendre la fin du build.
+
+4. **Configurer et démarrer**  
+   - Onglet **Configuration** : renseigner `ha_url`, `token` (jeton HA), `allowed_networks`, et les options du panel (`thermostat_entity_id`, etc.).  
+   - Onglet **Réseau** : le port (ex. 8765) doit être exposé.  
+   - **Démarrer** l’add-on.
+
+Ensuite, ouvrir **http://IP_DE_HA:8765/** (ou le port choisi) depuis un appareil du réseau local pour afficher le panel.
+
 ## Configuration
 
-1. **Installer et configurer l’add-on** (Thermostat Panel API).
-2. Dans les options de l’add-on : `ha_url`, `token`, `allowed_networks`, et les options du panel (`thermostat_entity_id`, `guest_entity_id`, etc.).
-3. Démarrer l’add-on, puis ouvrir **http://IP_HA:8765/** (ou le port configuré) depuis un appareil du réseau local. Le panel est servi par l’add-on.
+Une fois l’add-on installé, tout se règle dans ses **options** : `ha_url`, `token`, `allowed_networks`, `thermostat_entity_id`, `guest_entity_id`, etc. (voir la section ci-dessus pour l’installation et le démarrage).
 
 ## iPad lock-down
 
