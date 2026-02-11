@@ -7,8 +7,8 @@ ARG BUILD_VERSION
 # Python + pip
 RUN apk add --no-cache python3 py3-pip
 
-# Backend dependencies
-RUN pip3 install --no-cache-dir fastapi uvicorn httpx
+# Backend dependencies (--break-system-packages required with PEP 668 on recent Alpine/Python)
+RUN pip3 install --no-cache-dir --break-system-packages fastapi uvicorn httpx
 
 WORKDIR /app
 COPY main.py /app/
