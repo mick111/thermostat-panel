@@ -20,5 +20,6 @@ export HA_URL
 export TOKEN
 export ALLOWED_NETWORKS
 
+echo "SUPERVISOR_TOKEN: ${SUPERVISOR_TOKEN}"
 echo "Thermostat Panel API starting on port ${PORT}"
 cd /app && exec uvicorn main:app --host 0.0.0.0 --port "${PORT}"
