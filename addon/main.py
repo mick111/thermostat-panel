@@ -38,8 +38,6 @@ def _load_options():
         except Exception as e:
             logger.warning("Could not read /data/options.json: %s", e)
     # Complément / override par l'env
-    opts.setdefault("ha_url", os.environ.get("HA_URL", "auto"))
-    opts.setdefault("token", os.environ.get("TOKEN", ""))
     opts.setdefault("port", int(os.environ.get("PORT", "8765")))
     allowed = opts.get("allowed_networks")
     if not allowed and os.environ.get("ALLOWED_NETWORKS"):
@@ -53,56 +51,16 @@ def _load_options():
     return opts
 
 
-def _detect_ha_url(token: str) -> str:
-    """Détecte automatiquement l'URL de l'API Home Assistant."""
-    # Avec token : supervisor/core (SUPERVISOR_TOKEN) ou homeassistant:8123 (Long-Lived token)
-    # Sans token : seulement supervisor/core (SUPERVISOR_TOKEN sera utilisé au démarrage)
-    candidates = [
-        "http://supervisor/core",
-        "http://homeassistant:8123",  # Accès direct à Core (réseau interne), accepte le Long-Lived token
-        "http://localhost:8123",
-    ]
-    headers = {"Content-Type": "application/json"}
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-    for base in candidates:
-        try:
-            with httpx.Client(timeout=2.0) as client:
-                r = client.get(f"{base}/api/", headers=headers)
-                if r.status_code in (200, 401):
-                    logger.info("HA URL auto-détectée : %s", base)
-                    return base
-        except Exception as e:
-            logger.debug("Tentative %s : %s", base, e)
-    return "http://supervisor/core"
-
-
 OPTIONS = _load_options()
-_ha_url_raw = str(OPTIONS.get("ha_url", "auto")).strip().rstrip("/")
-if not _ha_url_raw or _ha_url_raw.lower() == "auto":
-    HA_URL = _detect_ha_url(OPTIONS.get("token") or "")
-else:
-    HA_URL = _ha_url_raw
-HA_URL = HA_URL.rstrip("/")
-# supervisor/core n'accepte que SUPERVISOR_TOKEN (pas le Long-Lived token).
-# Si on a un token utilisateur mais pas SUPERVISOR_TOKEN, on contacte Core directement via homeassistant:8123.
-if "supervisor/core" in HA_URL:
-    TOKEN = (os.environ.get("SUPERVISOR_TOKEN") or "").strip()
-    if not TOKEN:
-        TOKEN = str(OPTIONS.get("token", "")).strip()
-        if TOKEN:
-            # Le proxy supervisor/core ne forward pas le Long-Lived token → on utilise l'accès direct à Core
-            HA_URL = "http://homeassistant:8123"
-            logger.info("Utilisation du token des options vers http://homeassistant:8123 (Core direct).")
-    else:
-        logger.info("Utilisation du token Supervisor pour l'API Core.")
-else:
-    TOKEN = str(OPTIONS.get("token", "")).strip()
+HA_URL = "http://supervisor/core"
+TOKEN = (os.environ.get("SUPERVISOR_TOKEN") or "").strip()
 
-if not TOKEN and "supervisor/core" in HA_URL:
+if TOKEN:
+    logger.info("Utilisation du token Supervisor pour l'API Core.")
+else:
     logger.warning(
-        "SUPERVISOR_TOKEN non fourni et option « token » vide. "
-        "Renseignez un Long-Lived Access Token dans la configuration de l'add-on (Profil HA → Créer un jeton)."
+        "SUPERVISOR_TOKEN non fourni. Vérifiez homeassistant_api/hassio_api "
+        "et le démarrage via /usr/bin/with-contenv."
     )
 try:
     ALLOWED_NETWORKS = [
@@ -171,12 +129,12 @@ async def config_js():
 
 
 def _ha_response(r: httpx.Response) -> Response:
-    """Renvoie la réponse HA, avec message explicite en cas de 401 (token invalide)."""
+    """Renvoie la réponse HA, avec message explicite en cas de 401."""
     if r.status_code == 401:
         return JSONResponse(
             status_code=401,
             content={
-                "message": "Token Home Assistant invalide ou expiré. Vérifiez l'option « token » dans la configuration de l'add-on (Profil HA → Créer un jeton).",
+                "message": "Authentification Supervisor refusée par Home Assistant. Vérifiez que SUPERVISOR_TOKEN est bien injecté (homeassistant_api/hassio_api + with-contenv), puis redémarrez l'add-on.",
             },
         )
     return Response(
@@ -186,12 +144,11 @@ def _ha_response(r: httpx.Response) -> Response:
     )
 
 
-# Message lorsque Core est injoignable (connexion directe homeassistant:8123 souvent indisponible sur dépôt perso)
+# Message lorsque le proxy Supervisor/Core est injoignable
 _MSG_HA_UNREACHABLE = (
-    "Impossible de joindre Home Assistant (connexion refusée ou interrompue). "
-    "Avec un add-on installé depuis un dépôt personnalisé, l'accès direct à Core (homeassistant:8123) "
-    "peut ne pas être disponible. Essayez : (1) ha_url = « http://supervisor/core » et token vide "
-    "(nécessite un add-on du store officiel pour SUPERVISOR_TOKEN), ou (2) une URL personnalisée si votre Core est joignable autrement."
+    "Impossible de joindre Home Assistant via le proxy Supervisor "
+    "(http://supervisor/core). Vérifiez que Supervisor est actif et que "
+    "l'add-on démarre bien avec /usr/bin/with-contenv."
 )
 
 
@@ -218,7 +175,7 @@ async def get_state(entity_id: str):
         return JSONResponse(
             status_code=500,
             content={
-                "message": "Authentification HA manquante. Renseignez l'option « token » dans la configuration de l'add-on avec un Long-Lived Access Token (Profil HA → Créer un jeton), puis redémarrez l'add-on.",
+                "message": "Authentification HA manquante : SUPERVISOR_TOKEN absent. Vérifiez la configuration de l'add-on (homeassistant_api/hassio_api) et redémarrez.",
             },
         )
     url = f"{HA_URL}/api/states/{entity_id}"
@@ -238,7 +195,7 @@ async def set_temperature(request: Request):
         return JSONResponse(
             status_code=500,
             content={
-                "message": "Authentification HA manquante. Avec supervisor/core laissez « token » vide. Avec localhost:8123 renseignez un Long-Lived Access Token.",
+                "message": "Authentification HA manquante : SUPERVISOR_TOKEN absent. Vérifiez la configuration de l'add-on (homeassistant_api/hassio_api) et redémarrez.",
             },
         )
     body = await request.body()
@@ -260,7 +217,7 @@ async def set_preset_mode(request: Request):
         return JSONResponse(
             status_code=500,
             content={
-                "message": "Authentification HA manquante. Avec supervisor/core laissez « token » vide. Avec localhost:8123 renseignez un Long-Lived Access Token.",
+                "message": "Authentification HA manquante : SUPERVISOR_TOKEN absent. Vérifiez la configuration de l'add-on (homeassistant_api/hassio_api) et redémarrez.",
             },
         )
     body = await request.body()

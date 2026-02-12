@@ -25,7 +25,7 @@ The panel calls a **backend API** (add-on Thermostat Panel API) which proxies re
    - Cliquer sur l’add-on → **Installer** → attendre la fin du build.
 
 4. **Configurer et démarrer**  
-   - Onglet **Configuration** : renseigner `token` (jeton HA), `allowed_networks` (et éventuellement `ha_url` si besoin), et les options du panel (`thermostat_entity_id`, etc.).  
+   - Onglet **Configuration** : renseigner `allowed_networks` et les options du panel (`thermostat_entity_id`, etc.).  
    - Onglet **Réseau** : le port (ex. 8765) doit être exposé.  
    - **Démarrer** l’add-on.
 
@@ -33,7 +33,8 @@ Ensuite, ouvrir **http://IP_DE_HA:8765/** (ou le port choisi) depuis un appareil
 
 ## Configuration
 
-Une fois l’add-on installé, tout se règle dans ses **options** : `token`, `allowed_networks`, `thermostat_entity_id`, `guest_entity_id`, etc. L’option **`ha_url`** peut rester sur **`auto`** (détection automatique) ; voir **addon/README.md** pour les détails.
+Une fois l’add-on installé, tout se règle dans ses **options** : `allowed_networks`, `thermostat_entity_id`, `guest_entity_id`, etc.  
+L’API Home Assistant est forcée en interne sur `http://supervisor/core` et l’auth se fait via `SUPERVISOR_TOKEN` injecté par Supervisor.
 
 ## iPad lock-down
 
@@ -41,9 +42,9 @@ To restrict the iPad to this panel only: **Guided Access** (Settings → Accessi
 
 ## Home Assistant requirements
 
-- **Thermostat Panel API add-on** installed and running (token and allowed_networks configured).
+- **Thermostat Panel API add-on** installed and running (`allowed_networks` configured).
 - **climate** entity for the thermostat.
-- Long-Lived Access Token (stored in the add-on, not in the browser) with permission to read states and call climate services.
+- Sensor Entities with informations on the guest for greetings.
 
 ## Mode « Auto »
 

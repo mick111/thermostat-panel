@@ -1,37 +1,33 @@
 # Thermostat Panel API (add-on Home Assistant)
 
-Add-on qui expose une API FastAPI en proxy vers Home Assistant **et sert le panel thermostat** (HTML/JS/CSS intégrés). Le token HA est configuré dans l'add-on ; seules les IP des réseaux autorisés peuvent accéder au panel et à l'API.
+Add-on qui expose une API FastAPI en proxy vers Home Assistant **et sert le panel thermostat** (HTML/JS/CSS integres).
+
+Cette version est volontairement simplifiee pour un usage perso:
+
+- API Core **hard-codee** sur `http://supervisor/core`
+- authentification **uniquement** via `SUPERVISOR_TOKEN`
+- pas d'options `ha_url` ni `token`
 
 ## Installation
 
-- **Dépôt local** : copiez le dossier de l'add-on (config.yaml, Dockerfile, run.sh, main.py, static/) dans un dépôt d'add-ons reconnu par Home Assistant (Supervisor → Add-ons → Add-on store → ⋮ → Repositories).
-- Ou ajoutez ce repo comme dépôt et installez l'add-on « Thermostat Panel API ».
+- **Depot local** : copiez le dossier de l'add-on (`config.yaml`, `Dockerfile`, `run.sh`, `main.py`, `static/`) dans un depot d'add-ons reconnu par Home Assistant (Supervisor -> Add-ons -> Add-on store -> Repositories).
+- Ou ajoutez ce repo comme depot et installez l'add-on « Thermostat Panel API ».
 
 ## Configuration (options)
 
-- **port** : port d'écoute (défaut 8765). Doit correspondre au port exposé dans l'onglet Réseau de l'add-on.
-- **ha_url** : URL de l'API Home Assistant (voir ci-dessous). Valeur par défaut : **`auto`** (détection automatique).
-- **token** : Long-Lived Access Token (Profil HA → Créer un jeton). Obligatoire pour les add-ons installés depuis un dépôt personnalisé (le Supervisor ne fournit pas toujours son token). Avec `auto`, si vous renseignez le token, l'add-on contacte Core directement (`http://homeassistant:8123`) pour que le token soit accepté. **Attention** : sur certaines installations, l'accès direct à Core depuis l'add-on peut échouer (connexion refusée ou interrompue). Dans ce cas vous verrez une erreur 502 avec des pistes : utiliser `ha_url: http://supervisor/core` et laisser token vide si l'add-on est installé depuis le store officiel, ou indiquer une URL personnalisée vers votre instance Core.
-- **allowed_networks** : liste de réseaux CIDR autorisés (ex. `192.168.0.0/24`, `10.0.0.0/8`). Seules les requêtes dont l'IP source est dans l'un de ces réseaux sont acceptées.
-- **thermostat_entity_id**, **guest_entity_id**, **guest_count_entity_id**, **guest_dates_entity_id** : entités HA pour le panel.
-- **step_degrees**, **refresh_interval** : pas de température et intervalle de rafraîchissement (ms).
+- **port** : port d'ecoute (defaut 8765). Doit correspondre au port expose dans l'onglet Reseau de l'add-on.
+- **allowed_networks** : liste de reseaux CIDR autorises (ex. `192.168.0.0/24`, `10.0.0.0/8`).
+- **thermostat_entity_id**, **guest_entity_id**, **guest_count_entity_id**, **guest_dates_entity_id** : entites HA pour le panel.
+- **step_degrees**, **refresh_interval** : pas de temperature et intervalle de rafraichissement (ms).
 
-### ha_url : accès à l’API Home Assistant
+## Permissions add-on
 
-L’add-on doit joindre l’API HTTP de Home Assistant (Core) pour lire les états et appeler les services. Selon la façon dont vous exécutez Home Assistant, l’URL n’est pas la même.
+L'add-on active `homeassistant_api: true` et `hassio_api: true` dans `config.yaml` pour recuperer `SUPERVISOR_TOKEN` et acceder a l'API Core via `http://supervisor/core/api/`.
 
-| Valeur | Quand l’utiliser | Explication |
-|--------|------------------|-------------|
-| **`auto`** (recommandé) | Toujours, sauf cas particulier | L’add-on essaie d’abord `http://supervisor/core`, puis `http://homeassistant:8123`, puis `http://localhost:8123`. La première URL qui répond est utilisée. Aucune configuration à faire dans la plupart des cas. |
-| **`http://supervisor/core`** | Add-on installé via le **Add-on store** (HA OS ou Supervised) | L’add-on tourne dans un conteneur géré par le Supervisor. L’API Core est exposée via le nom de domaine interne **`supervisor`**. C’est le cas le plus courant. |
-| **`http://localhost:8123`** | Home Assistant Core installé **sans** Supervisor (Docker seul, venv, etc.) | L’API écoute sur la même machine, port 8123. Si l’add-on est dans un conteneur sur le même host, selon le réseau Docker il peut falloir utiliser l’IP du host (ex. `http://172.17.0.1:8123`) au lieu de `localhost`. |
+Le demarrage de `uvicorn` est execute via `/usr/bin/with-contenv` pour garantir la recuperation des variables d'environnement injectees par le Supervisor.
 
-En résumé : laisser **`auto`** pour une installation classique ; ne renseigner une URL explicite que si la détection automatique ne convient pas (environnement particulier ou dépannage).
-
-### Permissions add-on
-
-L'add-on active `homeassistant_api: true` **et** `hassio_api: true` dans `config.yaml` pour obtenir `SUPERVISOR_TOKEN` quand le Supervisor l'expose, et accéder à l'API Core via le proxy `http://supervisor/core/api/`. Le démarrage de `uvicorn` est exécuté via `/usr/bin/with-contenv` pour récupérer les variables d'environnement injectées par le Supervisor (dont `SUPERVISOR_TOKEN`).
+Reference doc: https://developers.home-assistant.io/docs/add-ons/communication
 
 ## Utilisation
 
-Une fois l'add-on démarré, ouvrez **http://IP_HA:8765/** (ou le port configuré) depuis un appareil sur le réseau local. Le panel s'affiche directement ; la configuration (entités, etc.) est lue depuis les options de l'add-on.
+Une fois l'add-on demarre, ouvrez **http://IP_HA:8765/** (ou le port configure) depuis un appareil du reseau local.
