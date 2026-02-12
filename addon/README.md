@@ -22,7 +22,7 @@ L’add-on doit joindre l’API HTTP de Home Assistant (Core) pour lire les éta
 
 | Valeur | Quand l’utiliser | Explication |
 |--------|------------------|-------------|
-| **`auto`** (recommandé) | Toujours, sauf cas particulier | L’add-on essaie d’abord `http://supervisor/core`, puis `http://localhost:8123`. La première URL qui répond est utilisée. Aucune configuration à faire dans la plupart des cas. |
+| **`auto`** (recommandé) | Toujours, sauf cas particulier | L’add-on essaie d’abord `http://supervisor/core`, puis `http://homeassistant:8123`, puis `http://localhost:8123`. La première URL qui répond est utilisée. Aucune configuration à faire dans la plupart des cas. |
 | **`http://supervisor/core`** | Add-on installé via le **Add-on store** (HA OS ou Supervised) | L’add-on tourne dans un conteneur géré par le Supervisor. L’API Core est exposée via le nom de domaine interne **`supervisor`**. C’est le cas le plus courant. |
 | **`http://localhost:8123`** | Home Assistant Core installé **sans** Supervisor (Docker seul, venv, etc.) | L’API écoute sur la même machine, port 8123. Si l’add-on est dans un conteneur sur le même host, selon le réseau Docker il peut falloir utiliser l’IP du host (ex. `http://172.17.0.1:8123`) au lieu de `localhost`. |
 
@@ -30,7 +30,7 @@ En résumé : laisser **`auto`** pour une installation classique ; ne renseigner
 
 ### Permissions add-on
 
-L'add-on active `homeassistant_api: true` **et** `hassio_api: true` dans `config.yaml` pour obtenir `SUPERVISOR_TOKEN` quand le Supervisor l'expose, et accéder à l'API Core via le proxy `http://supervisor/core/api/`.
+L'add-on active `homeassistant_api: true` **et** `hassio_api: true` dans `config.yaml` pour obtenir `SUPERVISOR_TOKEN` quand le Supervisor l'expose, et accéder à l'API Core via le proxy `http://supervisor/core/api/`. Le démarrage de `uvicorn` est exécuté via `/usr/bin/with-contenv` pour récupérer les variables d'environnement injectées par le Supervisor (dont `SUPERVISOR_TOKEN`).
 
 ## Utilisation
 

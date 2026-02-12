@@ -20,6 +20,15 @@ export HA_URL
 export TOKEN
 export ALLOWED_NETWORKS
 
-echo "SUPERVISOR_TOKEN: ${SUPERVISOR_TOKEN}"
+if [ -n "${SUPERVISOR_TOKEN}" ]; then
+  echo "SUPERVISOR_TOKEN détecté."
+else
+  echo "SUPERVISOR_TOKEN absent."
+fi
+
 echo "Thermostat Panel API starting on port ${PORT}"
-cd /app && exec uvicorn main:app --host 0.0.0.0 --port "${PORT}"
+cd /app
+if [ -x /usr/bin/with-contenv ]; then
+  exec /usr/bin/with-contenv uvicorn main:app --host 0.0.0.0 --port "${PORT}"
+fi
+exec uvicorn main:app --host 0.0.0.0 --port "${PORT}"
